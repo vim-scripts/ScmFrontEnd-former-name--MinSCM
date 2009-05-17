@@ -1,0 +1,308 @@
+This is a mirror of http://www.vim.org/scripts/script.php?script_id=2637
+
+Repository:
+  http://bitbucket.org/ns9tks/vim-scmfrontend/
+
+Issues:
+  http://bitbucket.org/ns9tks/vim-scmfrontend/issues/
+
+Download latest(development) version
+  https://bitbucket.org/ns9tks/vim-scmfrontend/get/tip.zip
+
+Screenshots:
+  http://bitbucket.org/ns9tks/vim-scmfrontend/wiki/Screenshots
+
+==============================================================================
+INTRODUCTION                                             *minscm-introduction*
+
+MinSCM is a plugin to manage your repositories of various SCM system (VCS).
+MinSCM provides an abstract interface, so you can manage repositories without
+being aware of differences between SCM systems.
+
+Features:
+  - Mercurial support
+  - Git support
+  - Bazaar support
+  - Abstract interface
+  - Many commands
+  - Syntax highlighting for status and diff in commit buffer.
+  - Syntax highlighting for annotate buffer
+  - Completion of revision/branch names
+  - Completion of locations for pull/push
+  - Repositories report on status line
+  - Collaboration with Fuzzyfinder plugin
+
+
+==============================================================================
+INSTALLATION                                             *minscm-installation*
+
+Put all files into your runtime directory. If you have the zip file, extract
+it to your runtime directory.
+
+You should place the files as follows:
+>
+        <your runtime directory>/plugin/minscm.vim
+        <your runtime directory>/autoload/minscm.vim
+        <your runtime directory>/autoload/minscm/mercurial.vim
+        ...
+<
+And then update your help tags files to enable MinSCM help. See
+|add-local-help| for details.
+
+==============================================================================
+USAGE                                                           *minscm-usage*
+
+See |minscm-commands|.
+
+                                                           *minscm-statusline*
+                                                        *g:minscm_getStatus()*
+To Show Repositories Information In Status Line ~
+
+Use g:minscm_getStatus(). (see also: |'statusline'|)
+
+                                                          *minscm-fuzzyfinder*
+Fuzzyfinder Plugin ~
+
+MinSCM uses APIs of fuzzyfinder.vim. Following commands are dependent on
+fuzzyfinder.vim:
+
+        :MinSCMFindFile
+
+fuzzyfinder.vim is available at
+http://www.vim.org/scripts/script.php?script_id=1984 .
+
+==============================================================================
+COMMANDS                                                     *minscm-commands*
+
+All commands is for a reposity including a file of current buffer.
+
+If MinSCM command was executed with a ! modifier, the priority of SCM systems
+is reversed.
+
+                                                              *:MinSCMCommand*
+:MinSCMCommand[!]               (Default mapping: \s:)
+
+        Executes any command you input.
+
+                                                           *:MinSCMCommitFile*
+:MinSCMCommitFile[!]            (Default mapping: \sC)
+
+        Opens temporary buffer for you to enter commit message. Write the
+        commit buffer and a file whose buffer was current before is committed.
+
+
+                Used SCM commands ~
+                hg  : commit
+                git : commit
+                bzr : commit
+
+                                                        *:MinSCMCommitTracked*
+:MinSCMCommitTracked[!]         (Default mapping: \s<C-c>)
+
+        Opens temporary buffer for you to enter commit message. Write the
+        commit buffer and all tracked files are committed.
+
+                Used SCM commands ~
+                hg  : commit
+                git : commit -a
+                bzr : commit
+
+                                                            *:MinSCMCommitAll*
+:MinSCMCommitAll[!]             (Default mapping: \sc)
+
+        Opens temporary buffer for you to enter commit message. Write the
+        commit buffer and all files in a working directory of a current
+        repository are committed.
+
+        This command is different from |:MinSCMCommitTracked| in adding
+        untracked files to the current repository.
+
+                Used SCM commands ~
+                hg  : commit -A
+                git : add -a && commit -a
+                bzr : add && commit
+
+                                                             *:MinSCMCheckout*
+:MinSCMCheckout[!]              (Default mapping: \so)
+
+        Checkouts specified revision.
+
+                Used SCM commands ~
+                hg  : update
+                git : checkout
+                bzr : (unavailable)
+
+                                                                *:MinSCMMerge*
+:MinSCMMerge[!]                 (Default mapping: \sm)
+
+        Merges working directory of a current repository with specified
+        revision.
+
+                Used SCM commands ~
+                hg  : merge
+                git : merge
+                bzr : (unavailable)
+
+                                                               *:MinSCMBranch*
+:MinSCMBranch[!]                (Default mapping: \sb)
+
+        Creates new branch.
+
+                Used SCM commands ~
+                hg  : branch
+                git : checkout -b
+                bzr : (unavailable)
+
+                                                         *:MinSCMBranchDelete*
+:MinSCMBranchDelete[!]          (Default mapping: \sB)
+
+        Deletes a branch.
+
+                Used SCM commands ~
+                hg  : (unavailable)
+                git : branch -d
+                bzr : (unavailable)
+
+                                                               *:MinSCMRebase*
+:MinSCMRebase[!]                (Default mapping: \sr)
+
+        Moves changeset onto specified revision.
+
+                Used SCM commands ~
+                hg  : rebase --keep -b
+                git : rebase
+                bzr : (unavailable)
+
+                                                                 *:MinSCMPull*
+:MinSCMPull[!]                  (Default mapping: \s[)
+
+        Pulls changes from specified repository.
+
+                Used SCM commands ~
+                hg  : pull
+                git : pull
+                bzr : pull
+
+                                                                 *:MinSCMPush*
+:MinSCMPush[!]                  (Default mapping: \s])
+
+        Pushes changes to specified repository.
+
+                Used SCM commands ~
+                hg  : push
+                git : push
+                bzr : push
+
+                                                             *:MinSCMDiffFile*
+:MinSCMDiffFile[!]              (Default mapping: \sD)
+
+        Starts diff mode (like vimdiff) in new tabpage between a file of a
+        current buffer and its version of specified revision.
+
+                Used SCM commands ~
+                hg  : cat
+                git : cat-file -p
+                bzr : cat
+
+                                                              *:MinSCMDiffAll*
+:MinSCMDiffAll[!]               (Default mapping: \sd)
+
+        Shows differences between all files in a working directory of a
+        current repository and specified revision.
+
+                Used SCM commands ~
+                hg  : diff
+                git : diff
+                bzr : diff
+
+                                                              *:MinSCMLogFile*
+:MinSCMLogFile[!]               (Default mapping: \sL)
+
+        Shows revision history related to a file of a current buffer. (see
+        also: |g:minscm_hgLogOption| |g:minscm_gitLogOption|
+        |g:minscm_bzrLogOption|)
+
+                Used SCM commands ~
+                hg  : glog
+                git : log
+                bzr : log
+
+                                                               *:MinSCMLogAll*
+:MinSCMLogAll[!]                (Default mapping: \sl)
+
+        Shows revision history. (see also: |g:minscm_hgLogOption|
+        |g:minscm_gitLogOption| |g:minscm_bzrLogOption|)
+
+                Used SCM commands ~
+                hg  : glog
+                git : log
+                bzr : log
+
+                                                         *:MinSCMAnnotateFile*
+:MinSCMAnnotateFile[!]          (Default mapping: \sn)
+
+        Shows commit information per file line.
+
+        Lines which were modified at the commit of specified revision or added
+        at the initial commit are highlighted.
+
+                Used SCM commands ~
+                hg  : annotate -nudq
+                git : blame
+                bzr : annotate --all --long
+
+                                                               *:MinSCMStatus*
+:MinSCMStatus[!]                (Default mapping: \ss)
+
+        Shows a list of changed files.
+
+                Used SCM commands ~
+                hg  : status
+                git : diff --name-status && ls-files --exclude-standard -o
+                bzr : status
+
+                                                                 *:MinSCMGrep*
+:MinSCMGrep[!]                  (Default mapping: \sg)
+
+        Searches for specified pattern and creates a |quickfix| list.
+
+                Used SCM commands ~
+                hg  : grep -n
+                git : grep -n -e
+                bzr : (unavailable)
+
+                                                         *:MinSCMLoadModified*
+:MinSCMLoadModified[!]          (Default mapping: \s!)
+
+        Loads all modified files with vim after unloading (by :bdelete)
+        buffers which are not modified files.
+
+                Used SCM commands ~
+                hg  : status -mn
+                git : ls-files -m
+                bzr : status -SV
+
+                                                              *:MinSCMLoadAll*
+:MinSCMLoadAll[!]               (Default mapping: \s<CR>)
+
+        Loads all tracked files with vim after unloading (by :bdelete) buffers
+        which are not tracked files.
+
+                Used SCM commands ~
+                hg  : locate -f
+                git : ls-files
+                bzr : ls
+
+                                                             *:MinSCMFindFile*
+:MinSCMFindFile[!]              (Default mapping: \sf)
+
+        Opens a selected file from all tracked files using Fuzzyfinder. 
+        (see also: |minscm-fuzzyfinder|)
+
+                Used SCM commands ~
+                hg  : locate -f
+                git : ls-files
+                bzr : ls
+
+==============================================================================
+

@@ -1,0 +1,237 @@
+*minscm.txt*    An abstract front-end for Mercurial/Git/Bazaar
+
+MinSCM                                                                *minscm*
+
+
+
+==============================================================================
+INTRODUCTION                                             *minscm-introduction*
+
+MinSCM is a plugin to manage your repositories of various SCM system (VCS).
+MinSCM provides an abstract interface, so you can manage repositories without
+being aware of differences between SCM systems.
+
+Features:
+  - Mercurial support
+  - Git support
+  - Bazaar support
+  - Abstract interface
+  - Many commands
+  - Revision/Branch completion
+  - Repositories report on status line
+
+
+==============================================================================
+INSTALLATION                                             *minscm-installation*
+
+Put all files into your runtime directory. If you have the zip file, extract
+it to your runtime directory.
+
+You should place the files as follows:
+>
+        <your runtime directory>/plugin/minscm.vim
+        <your runtime directory>/autoload/minscm.vim
+        <your runtime directory>/autoload/minscm/mercurial.vim
+        ...
+<
+And then update your help tags files to enable fuzzyfinder help. See
+|add-local-help| for details.
+
+==============================================================================
+USAGE                                                           *minscm-usage*
+
+See |minscm-commands|.
+
+                                                           *minscm-statusline*
+                                                        *g:minscm_getStatus()*
+To Show Repositories Information In Status Line ~
+
+Use g:minscm_getStatus(). Also see |'statusline'|.
+
+==============================================================================
+COMMANDS                                                     *minscm-commands*
+
+All commands is for a reposity including a file of current buffer.
+
+If MinSCM command was executed with a ! modifier, the priority of SCM systems
+is reversed.
+
+                                                              *:MinSCMCommand*
+:MinSCMCommand[!]               (Default mapping: \s:)
+        Executes any command you input.
+
+                                                           *:MinSCMCommitFile*
+:MinSCMCommitFile[!]            (Default mapping: \sC)
+        Commits a file of current buffer.
+
+                Command ~
+                hg : commit
+                git: commit
+                bzr: commit
+
+                                                        *:MinSCMCommitTracked*
+:MinSCMCommitTracked[!]         (Default mapping: \s<C-c>)
+        Commits files tracked by SCM system.
+
+                Command ~
+                hg : commit
+                git: commit -a
+                bzr: commit
+
+                                                            *:MinSCMCommitAll*
+:MinSCMCommitAll[!]             (Default mapping: \sc)
+        Commits all files in a working directory.
+
+                Command ~
+                hg : commit -A
+                git: add -a && commit -a
+                bzr: add && commit
+
+                                                             *:MinSCMCheckout*
+:MinSCMCheckout[!]              (Default mapping: \so)
+        Checkouts specified revision.
+
+                Command ~
+                hg : update
+                git: checkout
+                bzr: (unavailable)
+
+                                                                *:MinSCMMerge*
+:MinSCMMerge[!]                 (Default mapping: \sm)
+        Merges working directory with specified revision.
+
+                Command ~
+                hg : merge
+                git: merge
+                bzr: (unavailable)
+
+                                                               *:MinSCMBranch*
+:MinSCMBranch[!]                (Default mapping: \sb)
+        Creates new branch.
+
+                Command ~
+                hg : branch
+                git: checkout -b
+                bzr: (unavailable)
+
+                                                         *:MinSCMBranchDelete*
+:MinSCMBranchDelete[!]          (Default mapping: \sB)
+        Delete a branch.
+
+                Command ~
+                hg : (unavailable)
+                git: branch -d
+                bzr: (unavailable)
+
+                                                               *:MinSCMRebase*
+:MinSCMRebase[!]                (Default mapping: \sr)
+        Move changeset onto specified revision.
+
+                Command ~
+                hg : rebase -v --keep -b
+                git: rebase
+                bzr: (unavailable)
+
+                                                             *:MinSCMDiffFile*
+:MinSCMDiffFile[!]              (Default mapping: \sD)
+        Starts diff mode (like vimdiff) between working directory and
+        specified revision for a file of current buffer.
+
+                Command ~
+                hg : cat
+                git: cat-file -p
+                bzr: cat
+
+                                                              *:MinSCMDiffAll*
+:MinSCMDiffAll[!]               (Default mapping: \sd)
+        Shows differences between working directory and specified revision for
+        all files.
+
+                Command ~
+                hg : diff
+                git: diff
+                bzr: diff
+
+                                                                  *:MinSCMLog*
+:MinSCMLog[!]                   (Default mapping: \sl)
+        Shows revision history.
+
+                Command ~
+                hg : log --graph
+                git: log --graph --all
+                bzr: log
+
+                                                               *:MinSCMStatus*
+:MinSCMStatus[!]                (Default mapping: \ss)
+        Shows changed files.
+
+                Command ~
+                hg : status
+                git: diff --name-status && ls-files --exclude-standard -o
+                bzr: status
+
+                                                                 *:MinSCMGrep*
+:MinSCMGrep[!]                  (Default mapping: \sg)
+        Searches for specified patter.
+
+                Command ~
+                hg : grep
+                git: grep
+                bzr: (unavailable)
+
+                                                              *:MinSCMLoadAll*
+:MinSCMLoadAll[!]               (Default mapping: \s<CR>)
+        Loads all files with vim after unloading (by :bdelete) buffes which
+        are not tracked by current repository.
+
+                Command ~
+                hg : locate -f
+                git: ls-files
+                bzr: ls
+
+==============================================================================
+OPTIONS                                                       *minscm-options*
+
+                                                   *g:minscm_availableScms*  >
+        let g:minscm_availableScms = ['git', 'mercurial', 'bazaar']
+<
+                Names of SCM systems which you want to use.
+
+                If repositories of more than one SCM systems are found, the
+                repository of SCM system which appears before others in
+                g:minscm_availableScms has a priority.
+
+                                                       *g:minscm_mapLeader*  >
+        let g:minscm_mapLeader = '\s'
+<
+                Key sequence MinSCM key mappings begin with.
+
+                                              *g:minscm_mapLeaderAlternate*  >
+        let g:minscm_mapLeaderAlternate = '\S'
+<
+                Key sequence MinSCM key mappings begin with. This executes
+                same commands as |g:minscm_mapLeader| except that reverses the
+                priority of SCM systems
+
+
+
+==============================================================================
+CHANGELOG                                                   *minscm-changelog*
+
+0.1.0:
+  - First release.
+
+
+==============================================================================
+ABOUT           *minscm-about* *minscm-contact* *minscm-author*
+
+Author:  Takeshi NISHIDA <ns9tks@DELETE-ME.gmail.com>
+Licence: MIT Licence
+URL:     http://github.com/ns9tks/vim-minscm
+
+Bugs/Issues/Suggestions/Improvements ~
+
+Please submit to http://github.com/ns9tks/vim-minscm/issues .
+
+==============================================================================
+ vim:tw=78:ts=8:ft=help:norl:
