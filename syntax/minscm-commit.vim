@@ -1,6 +1,6 @@
 "=============================================================================
-" Author:  Takeshi NISHIDA <ns9tks@DELETE-ME.gmail.com>
-" Licence: MIT Licence
+" Copyright (c) 2009 Takeshi NISHIDA
+"
 "=============================================================================
 
 if exists("b:current_syntax")
@@ -30,9 +30,9 @@ syn match minscmCommitComment        "^#[ |]"           contained
 hi def link minscmCommitComment        Comment
 hi def link minscmCommitSummary        Title
 hi def link minscmCommitStatus         Constant
-hi def link minscmCommitStatusNew      Special
-hi def link minscmCommitStatusMissing  Identifier
-hi def link minscmCommitStatusModified Statement
+hi def link minscmCommitStatusNew      Identifier
+hi def link minscmCommitStatusMissing  Special
+hi def link minscmCommitStatusModified PreProc
 hi def link minscmCommitDiffNormal     Normal
 hi def link minscmCommitDiffFile       diffFile
 hi def link minscmCommitDiffRemoved    diffRemoved

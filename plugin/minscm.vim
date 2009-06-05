@@ -1,14 +1,14 @@
 "=============================================================================
-" Author:  Takeshi NISHIDA <ns9tks@DELETE-ME.gmail.com>
-" Licence: MIT Licence
-" Version: 0.1.0, for Vim 7.2
+" Copyright (c) 2009 Takeshi NISHIDA
+"
+" GetLatestVimScripts: 2637 1 :AutoInstall: minscm.vim
 "=============================================================================
 " LOAD GUARD: {{{1
 
 if exists('g:loaded_minscm') || v:version < 702
   finish
 endif
-let g:loaded_minscm = 000100 " Version xx.xx.xx
+let g:loaded_minscm = 000200 " Version xx.xx.xx
 
 
 " }}}1
@@ -29,7 +29,7 @@ endfunction
 function! s:initialize()
   " --------------------------------------------------------------------------
   if !exists('g:minscm_availableScms')
-    let g:minscm_availableScms = filter(['git', 'mercurial', 'bazaar'], 'minscm#{v:val}#isExecutable()')
+    let g:minscm_availableScms = filter(['mercurial', 'git', 'bazaar'], 'minscm#{v:val}#isExecutable()')
   endif
   if !exists('g:minscm_mapLeader')
     let g:minscm_mapLeader = '\s'
@@ -38,21 +38,22 @@ function! s:initialize()
     let g:minscm_mapLeaderAlternate = '\S'
   endif
   " --------------------------------------------------------------------------
-  command! -bang MinSCMCommand          call minscm#executeCommand         (len(<q-bang>), minscm#getTargetDir())
-  command! -bang MinSCMCommitFile       call minscm#executeCommitFile      (len(<q-bang>), minscm#getTargetDir())
-  command! -bang MinSCMCommitTracked    call minscm#executeCommitTracked   (len(<q-bang>), minscm#getTargetDir())
-  command! -bang MinSCMCommitAll        call minscm#executeCommitAll       (len(<q-bang>), minscm#getTargetDir())
-  command! -bang MinSCMCheckout         call minscm#executeCheckout        (len(<q-bang>), minscm#getTargetDir())
-  command! -bang MinSCMMerge            call minscm#executeMerge           (len(<q-bang>), minscm#getTargetDir())
-  command! -bang MinSCMBranch           call minscm#executeBranch          (len(<q-bang>), minscm#getTargetDir())
-  command! -bang MinSCMBranchDelete     call minscm#executeBranchDelete    (len(<q-bang>), minscm#getTargetDir())
-  command! -bang MinSCMRebase           call minscm#executeRebase          (len(<q-bang>), minscm#getTargetDir())
-  command! -bang MinSCMDiffFile         call minscm#executeDiffFile        (len(<q-bang>), minscm#getTargetDir())
-  command! -bang MinSCMDiffAll          call minscm#executeDiffAll         (len(<q-bang>), minscm#getTargetDir())
-  command! -bang MinSCMLog              call minscm#executeLog             (len(<q-bang>), minscm#getTargetDir())
-  command! -bang MinSCMStatus           call minscm#executeStatus          (len(<q-bang>), minscm#getTargetDir())
-  command! -bang MinSCMGrep             call minscm#executeGrep            (len(<q-bang>), minscm#getTargetDir())
-  command! -bang MinSCMLoadAll          call minscm#executeLoadAll         (len(<q-bang>), minscm#getTargetDir())
+  command! -bang MinSCMCommand       call minscm#executeCommand      (len(<q-bang>), minscm#getTargetDir())
+  command! -bang MinSCMCommitFile    call minscm#executeCommitFile   (len(<q-bang>), minscm#getTargetDir())
+  command! -bang MinSCMCommitTracked call minscm#executeCommitTracked(len(<q-bang>), minscm#getTargetDir())
+  command! -bang MinSCMCommitAll     call minscm#executeCommitAll    (len(<q-bang>), minscm#getTargetDir())
+  command! -bang MinSCMCheckout      call minscm#executeCheckout     (len(<q-bang>), minscm#getTargetDir())
+  command! -bang MinSCMMerge         call minscm#executeMerge        (len(<q-bang>), minscm#getTargetDir())
+  command! -bang MinSCMBranch        call minscm#executeBranch       (len(<q-bang>), minscm#getTargetDir())
+  command! -bang MinSCMBranchDelete  call minscm#executeBranchDelete (len(<q-bang>), minscm#getTargetDir())
+  command! -bang MinSCMRebase        call minscm#executeRebase       (len(<q-bang>), minscm#getTargetDir())
+  command! -bang MinSCMDiffFile      call minscm#executeDiffFile     (len(<q-bang>), minscm#getTargetDir())
+  command! -bang MinSCMDiffAll       call minscm#executeDiffAll      (len(<q-bang>), minscm#getTargetDir())
+  command! -bang MinSCMLog           call minscm#executeLog          (len(<q-bang>), minscm#getTargetDir())
+  command! -bang MinSCMStatus        call minscm#executeStatus       (len(<q-bang>), minscm#getTargetDir())
+  command! -bang MinSCMGrep          call minscm#executeGrep         (len(<q-bang>), minscm#getTargetDir())
+  command! -bang MinSCMLoadAll       call minscm#executeLoadAll      (len(<q-bang>), minscm#getTargetDir())
+  command! -bang MinSCMFindFile      call minscm#executeFindFile     (len(<q-bang>), minscm#getTargetDir())
   " --------------------------------------------------------------------------
   let tableMapping = [
         \   [':     ', ':MinSCMCommand'      ],
@@ -70,6 +71,7 @@ function! s:initialize()
         \   ['s     ', ':MinSCMStatus'       ],
         \   ['g     ', ':MinSCMGrep'         ],
         \   ['<CR>  ', ':MinSCMLoadAll'      ],
+        \   ['f     ', ':MinSCMFindFile'     ],
         \ ]
   for [leader, bang] in [ [g:minscm_mapLeader, ''], [g:minscm_mapLeaderAlternate, '!'] ]
     execute printf('nnoremap <silent> %s      <Nop>', leader)

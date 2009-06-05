@@ -1,18 +1,6 @@
-" MEMO #######################################################################
-"
-" TODO:
-"   - Commands:
-"     + -----------------+-----------------------+----------------------------+
-"     | MinSCM command   | hg                    | git  --no-pager            |
-"     + ---------------- + --------------------- + ---------------------------+
-"     + -----------------+-----------------------+----------------------------+
-"   - Bazaar
-"
-" ############################################################################
-"
 "=============================================================================
-" Author:  Takeshi NISHIDA <ns9tks@DELETE-ME.gmail.com>
-" Licence: MIT Licence
+" Copyright (c) 2009 Takeshi NISHIDA
+"
 "=============================================================================
 " PUBLIC: minscm#execute*: {{{1
 
@@ -153,6 +141,15 @@ function! minscm#executeLoadAll(boolAlt, cwd)
     return
   endif
   call impl.loadAll()
+endfunction
+
+"
+function! minscm#executeFindFile(boolAlt, cwd)
+  let impl = s:createImplementor(a:boolAlt, a:cwd, 1)
+  if !impl.isValid() || !s:warnIfUnsavedBufferExist(0)
+    return
+  endif
+  call impl.findFile()
 endfunction
 
 " }}}1
@@ -571,6 +568,11 @@ function s:implementorBase.loadAll()
   call s:loadFiles(files)
 endfunction
 
+"
+function s:implementorBase.findFile()
+  call g:FuzzyFinderMode.GivenFile.launch('', 0, self.getLsAll())
+endfunction
+
 " throws "MinSCM:execute\n..." if shell command had an error.
 function s:implementorBase.execute(args)
   let cmd = join([self.getCommandPrefix()] + a:args, ' ')
@@ -594,14 +596,13 @@ endfunction
 
 "
 function s:implementorBase.getRepositoryReport()
-  return printf('%s - %s - %s (%d)',
-        \       self.getScmName(), self.dirRoot, self.getBranchCurrent(), len(self.getStatusesAll()))
+  return printf('%s - %s - %s',
+        \       self.getScmName(), self.dirRoot, self.getBranchCurrent())
 endfunction
 
 "
 function s:implementorBase.getStatusReport()
-  let numStatuses = len(self.getStatusesAll())
-  return self.getCommandName() . ':' . self.getBranchCurrent() . (numStatuses > 0 ? '(' . numStatuses . ')' : '')
+  return self.getCommandName() . ':' . self.getBranchCurrent()
 endfunction
 
 " }}}1

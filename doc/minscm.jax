@@ -1,0 +1,266 @@
+*minscm.txt*    Mercurial/Git/Bazaar フロントエンド
+
+        Copyright (c) 2009 Takeshi NISHIDA
+
+MinSCM                                                                *minscm*
+
+概要                            |minscm-introduction|
+インストール                    |minscm-installation|
+使い方                          |minscm-usage|
+コマンド                        |minscm-commands|
+オプション                      |minscm-options|
+CHANGELOG                       |minscm-changelog|
+あばうと                        |minscm-about|
+
+==============================================================================
+概要                                                     *minscm-introduction*
+
+MinSCM は様々な SCM システム (VCS) のリポジトリを扱うプラグインです。抽象化さ
+れたインターフェースにより SCM システムの違いを意識することなくリポジトリを扱
+うことができます。
+
+特徴:
+  - Mercurial サポート
+  - Git サポート
+  - Bazaar サポート
+  - 抽象化されたインターフェース
+  - 多くのコマンド
+  - リビジョン名の補完
+  - リポジトリ情報のステータスラインでの表示
+
+
+==============================================================================
+インストール                                             *minscm-installation*
+
+全てのファイルをランタイムディレクトリに配置してください。ZIPファイルを入手し
+た場合は、それをランタイムディレクトリに展開してください。
+
+ファイルの配置はは次のようになります。:
+>
+        <ランタイムディレクトリ>/plugin/minscm.vim
+        <ランタイムディレクトリ>/autoload/minscm.vim
+        <ランタイムディレクトリ>/autoload/minscm/mercurial.vim
+        ...
+<
+それからヘルプタグファイルを更新してください。詳しくは|add-local-help|を参照してください。
+
+==============================================================================
+使い方                                                          *minscm-usage*
+
+|minscm-commands|を参照してください。
+
+                                                           *minscm-statusline*
+                                                        *g:minscm_getStatus()*
+リポジトリ情報をステータスラインに表示 ~
+
+g:minscm_getStatus() を利用してください。|'statusline'|も参照してください。
+
+                                                          *minscm-fuzzyfinder*
+Fuzzyfinder プラグインとの連携 ~
+
+MinSCM は fuzzyfinder.vim の API を利用しています。以下のコマンドは
+fuzzyfinder.vim に依存しています:
+
+        :MinSCMFindFile
+
+fuzzyfinder.vim は http://www.vim.org/scripts/script.php?script_id=1984 で入手
+可能です。
+
+==============================================================================
+コマンド                                                     *minscm-commands*
+
+全てのコマンドはカレントバッファのファイルを含むリポジトリに対して実行されます
+。
+
+MinSCM のコマンドが ! 修飾子付きで実行された場合、利用するSCMシステムの優先順
+位を逆転させます。
+
+                                                              *:MinSCMCommand*
+:MinSCMCommand[!]               (デフォルトキーマッピング: \s:)
+        入力した任意のコマンドを実行します。
+
+                                                           *:MinSCMCommitFile*
+:MinSCMCommitFile[!]            (デフォルトキーマッピング: \sC)
+        カレントバッファのファイルをコミットします。
+
+                使用する SCM コマンド ~
+                hg  : commit
+                git : commit
+                bzr : commit
+
+                                                        *:MinSCMCommitTracked*
+:MinSCMCommitTracked[!]         (デフォルトキーマッピング: \s<C-c>)
+        追跡されている全ファイルをコミットします。
+
+                使用する SCM コマンド ~
+                hg  : commit
+                git : commit -a
+                bzr : commit
+
+                                                            *:MinSCMCommitAll*
+:MinSCMCommitAll[!]             (デフォルトキーマッピング: \sc)
+        カレントリポジトリの作業ディレクトリ内の全ファイルをコミットします。
+
+        追跡されていないファイルをカレントリポジトリに追加する点が
+        |:MinSCMCommitTracked| と異なります。
+
+                使用する SCM コマンド ~
+                hg  : commit -A
+                git : add -a && commit -a
+                bzr : add && commit
+
+                                                             *:MinSCMCheckout*
+:MinSCMCheckout[!]              (デフォルトキーマッピング: \so)
+        指定したリビジョンをチェックアウトします。
+
+                使用する SCM コマンド ~
+                hg  : update
+                git : checkout
+                bzr : (unavailable)
+
+                                                                *:MinSCMMerge*
+:MinSCMMerge[!]                 (デフォルトキーマッピング: \sm)
+        指定したリビジョンを作業ディレクトリにマージします。
+
+                使用する SCM コマンド ~
+                hg  : merge
+                git : merge
+                bzr : (unavailable)
+
+                                                               *:MinSCMBranch*
+:MinSCMBranch[!]                (デフォルトキーマッピング: \sb)
+        新ブランチを作成します。
+
+                使用する SCM コマンド ~
+                hg  : branch
+                git : checkout -b
+                bzr : (unavailable)
+
+                                                         *:MinSCMBranchDelete*
+:MinSCMBranchDelete[!]          (デフォルトキーマッピング: \sB)
+        既存のブランチを削除します。
+
+                使用する SCM コマンド ~
+                hg  : (unavailable)
+                git : branch -d
+                bzr : (unavailable)
+
+                                                               *:MinSCMRebase*
+:MinSCMRebase[!]                (デフォルトキーマッピング: \sr)
+        チェンジセットを指定したリビジョンへ移動します。
+
+                使用する SCM コマンド ~
+                hg  : rebase --keep -b
+                git : rebase
+                bzr : (unavailable)
+
+                                                             *:MinSCMDiffFile*
+:MinSCMDiffFile[!]              (デフォルトキーマッピング: \sD)
+        カレントバッファのファイルとその指定リビジョンのバージョン間で、
+        (vimdiff のような) Diff モードを新規タブページで開始します。
+
+                使用する SCM コマンド ~
+                hg  : cat
+                git : cat-file -p
+                bzr : cat
+
+                                                              *:MinSCMDiffAll*
+:MinSCMDiffAll[!]               (デフォルトキーマッピング: \sd)
+        カレントリポジトリの作業ディレクトリ内の全ファイルと指定リビジョン間の
+        差分を表示します。
+
+                使用する SCM コマンド ~
+                hg  : diff
+                git : diff
+                bzr : diff
+
+                                                                  *:MinSCMLog*
+:MinSCMLog[!]                   (デフォルトキーマッピング: \sl)
+        リビジョンの履歴を表示します。
+
+                使用する SCM コマンド ~
+                hg  : log --graph
+                git : log --graph --all
+                bzr : log
+
+                                                               *:MinSCMStatus*
+:MinSCMStatus[!]                (デフォルトキーマッピング: \ss)
+        変更のあるファイルのリストを表示します。
+
+                使用する SCM コマンド ~
+                hg  : status
+                git : diff --name-status && ls-files --exclude-standard -o
+                bzr : status
+
+                                                                 *:MinSCMGrep*
+:MinSCMGrep[!]                  (デフォルトキーマッピング: \sg)
+        指定パターンで検索します。
+
+                使用する SCM コマンド ~
+                hg  : grep
+                git : grep
+                bzr : (unavailable)
+
+                                                              *:MinSCMLoadAll*
+:MinSCMLoadAll[!]               (デフォルトキーマッピング: \s<CR>)
+        追跡されている全ファイルを vim に読み込みます。無関係のバッファは
+        (:bdelete で)アンロードされます。
+
+                使用する SCM コマンド ~
+                hg  : locate -f
+                git : ls-files
+                bzr : ls
+
+                                                             *:MinSCMFindFile*
+:MinSCMFindFile[!]              (デフォルトキーマッピング: \sf)
+        Fuzzyfinder を使って追跡されている全ファイルの中からファイルを選択
+        して開きます。
+
+        |minscm-fuzzyfinder|も参照してください。
+
+                使用する SCM コマンド ~
+                hg  : locate -f
+                git : ls-files
+                bzr : ls
+
+==============================================================================
+オプション                                                    *minscm-options*
+
+                                                   *g:minscm_availableScms*  >
+        let g:minscm_availableScms = ['git', 'mercurial', 'bazaar']
+<
+                利用したい SCM システム名のリストです。
+
+                複数のSCMシステムのリポジトリが見つかった場合、カレントとなる
+                リポジトリの優先順位は g:minscm_availableScms の順に準じます。
+
+                                                       *g:minscm_mapLeader*  >
+        let g:minscm_mapLeader = '\s'
+<
+                MinSCM のキーマッピングのプレフィックスとなるキー列です。
+
+                                              *g:minscm_mapLeaderAlternate*  >
+        let g:minscm_mapLeaderAlternate = '\S'
+<
+                MinSCM のキーマッピングのプレフィックスとなるキー列です。
+
+                このプレフィックスから実行されたコマンドでは、利用する SCM シ
+                ステムの優先順位が逆転します。
+
+
+
+==============================================================================
+あばうと                       *minscm-about* *minscm-contact* *minscm-author*
+
+作者:       Takeshi NISHIDA <ns9tks@DELETE-ME.gmail.com>
+ライセンス: MIT Licence
+URL:        http://www.vim.org/scripts/script.php?script_id=2637
+            http://bitbucket.org/ns9tks/vim-minscm/
+
+バグや要望など ~
+
+http://bitbucket.org/ns9tks/vim-minscm/issues/ に登録してもらえると助かります。
+
+==============================================================================
+ vim:tw=78:ts=8:ft=help:norl:
+

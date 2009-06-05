@@ -1,6 +1,6 @@
 "=============================================================================
-" Author:  Takeshi NISHIDA <ns9tks@DELETE-ME.gmail.com>
-" Licence: MIT Licence
+" Copyright (c) 2009 Takeshi NISHIDA
+"
 "=============================================================================
 " PUBLIC: {{{1
 
