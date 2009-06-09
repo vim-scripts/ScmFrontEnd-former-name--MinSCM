@@ -575,9 +575,15 @@ endfunction
 
 " throws "MinSCM:execute\n..." if shell command had an error.
 function s:implementorBase.execute(args)
+  let error = 0
   let cmd = join([self.getCommandPrefix()] + a:args, ' ')
-  let out = system(cmd)
-  if v:shell_error
+  try
+    let out = system(cmd)
+  catch
+    let error = 1
+    let out = v:exception
+  endtry
+  if error || v:shell_error
     throw printf("MinSCM:execute: Command error (%d)\n%s\n%s", v:shell_error, cmd, out)
   endif
   return out

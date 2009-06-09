@@ -252,6 +252,10 @@ OPTIONS                                                       *minscm-options*
 ==============================================================================
 CHANGELOG                                                   *minscm-changelog*
 
+0.2.1:
+  - Fixed a bug that the log command for Mercurial repositories didn't work on
+    Windows.
+
 0.2.0:
   - Changed not to show modified files number on a status line.
   - Changed highlight of a commit buffer.

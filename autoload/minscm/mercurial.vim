@@ -103,7 +103,7 @@ endfunction
 
 "
 function s:implementor.getLogLines()
-  let template = '''{rev}:{node|short} ({date|isodate}) {desc|firstline}\n'''
+  let template = '"{rev}:{node|short} ({date|isodate}) {desc|firstline}\n"'
   try
     return split(self.execute(['log --graph --template', template]), "\n")
   catch /^MinSCM:execute:.*/
