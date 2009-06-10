@@ -75,7 +75,8 @@ endfunction
 
 "
 function s:implementor.getCatFileLines(revision, file)
-  let optObj = a:revision . ':' . minscm#escapeForShell(minscm#modifyPathRelativeToDir(a:file, self.dirRoot))
+  let optObj = a:revision . ':' .
+        \ minscm#escapeForShell(minscm#modifyPathRelativeToDir(a:file, self.dirRoot))
   return split(self.execute(['cat-file -p', optObj]), "\n")
 endfunction
 
@@ -86,7 +87,11 @@ endfunction
 
 "
 function s:implementor.getBranchCurrent()
-  return matchstr(filter(split(self.execute(['branch']), "\n"), 'v:val =~ ''^*''')[0], '^\*\s*\zs.*$')
+  let curBranches = filter(split(self.execute(['branch']), "\n"), 'v:val =~ ''^*''')
+  if empty(curBranches)
+    return '(?)'
+  endif
+  return matchstr(curBranches[0], '^\*\s*\zs.*$')
 endfunction
 
 "
@@ -108,8 +113,7 @@ endfunction
 
 "
 function s:implementor.getLogLines()
-  let optPretty = '--pretty=format:''%h (%ci) %s'''
-  return split(self.execute(['log --all --graph', optPretty]), "\n")
+  return split(self.execute(['log', g:minscm_gitLogOption]), "\n")
 endfunction
 
 "
@@ -122,7 +126,12 @@ endfunction
 
 "
 function s:implementor.getStatusesTracked()
-  return map(split(self.execute(['diff --name-status HEAD']), "\n"), 's:formatStatusLine(v:val)')
+  try
+    return map(split(self.execute(['diff --name-status HEAD']), "\n"), 's:formatStatusLine(v:val)')
+  catch /^MinSCM:execute:.*/
+    " There are no tracked files.
+    return []
+  endtry
 endfunction
 
 "
@@ -132,9 +141,12 @@ function s:implementor.getStatusesAll()
 endfunction
 
 "
-function s:implementor.getGrepLines(pattern)
+function s:implementor.getGrepQuickFixes(pattern)
   try
-    return split(self.execute(['grep -n -e', minscm#escapeForShell(a:pattern)]), "\n")
+    let pathPrefix = fnamemodify(self.dirRoot, ":p:.")
+    let cmds = ['grep -n -e', minscm#escapeForShell(a:pattern)]
+    return map(split(self.execute(cmds), "\n"),
+          \    'minscm#makeQuickFixEntry(v:val, 0, 1, 2, pathPrefix)')
   catch /^MinSCM:execute:.*/
     " if matching lines are not found, shell status isn't zero.
     if len(split(v:exception, "\n")) > 2
@@ -146,7 +158,8 @@ endfunction
 
 "
 function s:implementor.getLsAll()
-  return map(split(self.execute(['ls-files --full-name']), "\n"), 'fnamemodify(self.dirRoot, ":p") . v:val')
+  return map(split(self.execute(['ls-files --full-name']), "\n"),
+        \    'fnamemodify(self.dirRoot, ":p") . v:val')
 endfunction
 
 "

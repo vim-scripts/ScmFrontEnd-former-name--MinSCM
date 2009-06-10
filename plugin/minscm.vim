@@ -8,7 +8,7 @@
 if exists('g:loaded_minscm') || v:version < 702
   finish
 endif
-let g:loaded_minscm = 000200 " Version xx.xx.xx
+let g:loaded_minscm = 1
 
 
 " }}}1
@@ -36,6 +36,15 @@ function! s:initialize()
   endif
   if !exists('g:minscm_mapLeaderAlternate')
     let g:minscm_mapLeaderAlternate = '\S'
+  endif
+  if !exists('g:minscm_hgLogOption')
+    let g:minscm_hgLogOption = '--style compact'
+  endif
+  if !exists('g:minscm_gitLogOption')
+    let g:minscm_gitLogOption = '--all --graph --pretty=format:''%h (%ci) %s'''
+  endif
+  if !exists('g:minscm_bzrLogOption')
+    let g:minscm_bzrLogOption = '--line'
   endif
   " --------------------------------------------------------------------------
   command! -bang MinSCMCommand       call minscm#executeCommand      (len(<q-bang>), minscm#getTargetDir())

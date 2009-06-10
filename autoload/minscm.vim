@@ -235,6 +235,16 @@ function! minscm#escapeForShell(str)
 endfunction
 
 "
+function minscm#makeQuickFixEntry(str, indexFile, indexLineNum, indexText, pathPrefix)
+  let tokens = split(a:str, ':', 1)
+  return  {
+        \   'filename' : a:pathPrefix . tokens[a:indexFile],
+        \   'lnum' : tokens[a:indexLineNum],
+        \   'text' : join(tokens[a:indexText : ], ':'),
+        \ }
+endfunction
+
+"
 function! minscm#completeCmdline(lead, line, pos)
   return join(s:candidatesForCmdlineCompletion, "\n")
 endfunction
@@ -281,10 +291,17 @@ function s:implementorBase.commitFile()
     call minscm#echo('No changes.')
     return
   endif
-  let lines = s:formatCommitBufferLines(self.getScmName(), self.dirRoot, self.getBranchCurrent(), statuses,
-        \                               self.getDiffFileLines(self.getRevisionHead(), fileTarget))
-  call s:tempbuffer_launch(lines, self.formatTempBufferName('CommitFile'), 'minscm-commit',
-        \                  1, self, 'onCloseForCommit', 'onWriteForCommitFile')
+  try
+    let linesDiff = self.getDiffFileLines(self.getRevisionHead(), fileTarget)
+  catch
+    let linesDiff = []
+  endtry
+  let lines = s:formatCommitBufferLines(
+        \ self.getScmName(), self.dirRoot,
+        \ self.getBranchCurrent(), statuses, linesDiff)
+  call s:tempbuffer_launch(
+        \ lines, self.formatTempBufferName('CommitFile'), 'minscm-commit',
+        \ 1, self, 'onCloseForCommit', 'onWriteForCommitFile')
 endfunction
 
 "
@@ -295,10 +312,17 @@ function s:implementorBase.commitTracked()
     call minscm#echo('No changes.')
     return
   endif
-  let lines = s:formatCommitBufferLines(self.getScmName(), self.dirRoot, self.getBranchCurrent(), statuses,
-        \ self.getDiffAllLines(self.getRevisionHead()))
-  call s:tempbuffer_launch(lines, self.formatTempBufferName('CommitTracked'), 'minscm-commit',
-        \                  1, self, 'onCloseForCommit', 'onWriteForCommitTracked')
+  try
+    let linesDiff = self.getDiffAllLines(self.getRevisionHead())
+  catch
+    let linesDiff = []
+  endtry
+  let lines = s:formatCommitBufferLines(
+        \ self.getScmName(), self.dirRoot,
+        \ self.getBranchCurrent(), statuses, linesDiff)
+  call s:tempbuffer_launch(
+        \ lines, self.formatTempBufferName('CommitTracked'), 'minscm-commit',
+        \ 1, self, 'onCloseForCommit', 'onWriteForCommitTracked')
 endfunction
 
 "
@@ -309,10 +333,17 @@ function s:implementorBase.commitAll()
     call minscm#echo('No changes.')
     return
   endif
-  let lines = s:formatCommitBufferLines(self.getScmName(), self.dirRoot, self.getBranchCurrent(), statuses,
-        \ self.getDiffAllLines(self.getRevisionHead()))
-  call s:tempbuffer_launch(lines, self.formatTempBufferName('CommitAll'), 'minscm-commit',
-        \                  1, self, 'onCloseForCommit', 'onWriteForCommitAll')
+  try
+    let linesDiff = self.getDiffAllLines(self.getRevisionHead())
+  catch
+    let linesDiff = []
+  endtry
+  let lines = s:formatCommitBufferLines(
+        \ self.getScmName(), self.dirRoot,
+        \ self.getBranchCurrent(), statuses, linesDiff)
+  call s:tempbuffer_launch(
+        \ lines, self.formatTempBufferName('CommitAll'), 'minscm-commit',
+        \ 1, self, 'onCloseForCommit', 'onWriteForCommitAll')
 endfunction
 
 "
@@ -552,13 +583,17 @@ endfunction
 "
 function s:implementorBase.grep()
   call minscm#echo('Grep: ' . self.getRepositoryReport())
-  if !exists('self.getGrepLines')
+  if !exists('self.getGrepQuickFixes')
     call minscm#echoError('This command is not supported.')
     return
   endif
   let pattern = s:inputHighlighting('Question', 'Search pattern: ')
-  redraw
-  call minscm#echo(self.getGrepLines(pattern))
+  if pattern == ''
+    call minscm#echoWarning('Canceled')
+    return
+  endif
+  call setqflist(self.getGrepQuickFixes(pattern))
+  cope
 endfunction
 
 "

@@ -103,11 +103,11 @@ endfunction
 
 "
 function s:implementor.getLogLines()
-  let template = '"{rev}:{node|short} ({date|isodate}) {desc|firstline}\n"'
   try
-    return split(self.execute(['log --graph --template', template]), "\n")
+    return split(self.execute(['glog', g:minscm_hgLogOption]), "\n")
   catch /^MinSCM:execute:.*/
-    return ['(To show a revision graph, enable graphlog extension.)', ''] + split(self.execute(['log --template', template]), "\n")
+    return ['(To show a revision graph, enable graphlog extension.)', ''] +
+          \ split(self.execute(['log', g:minscm_hgLogOption]), "\n")
   endtry
 endfunction
 
@@ -127,9 +127,12 @@ function s:implementor.getStatusesAll()
 endfunction
 
 "
-function s:implementor.getGrepLines(pattern)
+function s:implementor.getGrepQuickFixes(pattern)
   try
-    return split(self.execute(['grep -n', minscm#escapeForShell(a:pattern)]), "\n")
+    let pathPrefix = fnamemodify(self.dirRoot, ":p:.")
+    let cmds = ['grep -n', minscm#escapeForShell(a:pattern)]
+    return map(split(self.execute(cmds), "\n"),
+          \    'minscm#makeQuickFixEntry(v:val, 0, 2, 3, pathPrefix)')
   catch /^MinSCM:execute:.*/
     " if matching lines are not found, shell status isn't zero.
     if len(split(v:exception, "\n")) > 2

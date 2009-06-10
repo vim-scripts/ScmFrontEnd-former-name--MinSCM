@@ -54,7 +54,7 @@ See |minscm-commands|.
                                                         *g:minscm_getStatus()*
 To Show Repositories Information In Status Line ~
 
-Use g:minscm_getStatus(). Also see |'statusline'|.
+Use g:minscm_getStatus(). (see also: |'statusline'|)
 
                                                           *minscm-fuzzyfinder*
 Fuzzyfinder Plugin ~
@@ -177,11 +177,12 @@ is reversed.
 
                                                                   *:MinSCMLog*
 :MinSCMLog[!]                   (Default mapping: \sl)
-        Shows revision history.
+        Shows revision history. (see also: |g:minscm_hgLogOption|
+        |g:minscm_gitLogOption| |g:minscm_bzrLogOption|)
 
                 Used SCM commands ~
-                hg  : log --graph
-                git : log --graph --all
+                hg  : glog
+                git : log
                 bzr : log
 
                                                                *:MinSCMStatus*
@@ -195,11 +196,11 @@ is reversed.
 
                                                                  *:MinSCMGrep*
 :MinSCMGrep[!]                  (Default mapping: \sg)
-        Searches for specified pattern.
+        Searches for specified pattern and creates a |quickfix| list.
 
                 Used SCM commands ~
-                hg  : grep
-                git : grep
+                hg  : grep -n
+                git : grep -n -e
                 bzr : (unavailable)
 
                                                               *:MinSCMLoadAll*
@@ -213,9 +214,8 @@ is reversed.
                 bzr : ls
                                                              *:MinSCMFindFile*
 :MinSCMFindFile[!]              (Default mapping: \sf)
-        Opens a selected file from all tracked files using Fuzzyfinder.
-
-        Also see |minscm-fuzzyfinder|.
+        Opens a selected file from all tracked files using Fuzzyfinder. 
+        (see also: |minscm-fuzzyfinder|)
 
                 Used SCM commands ~
                 hg  : locate -f
@@ -247,10 +247,30 @@ OPTIONS                                                       *minscm-options*
                 This executes same commands as |g:minscm_mapLeader| except
                 that reverses the priority of SCM systems.
 
+                                                     *g:minscm_hgLogOption*
+                                                    *g:minscm_gitLogOption*
+                                                    *g:minscm_bzrLogOption*  >
+        let g:minscm_hgLogOption = '--style compact'
+        let g:minscm_gitLogOption = '--all --graph --pretty=format:''%h (%ci) %s'''
+        let g:minscm_bzrLogOption = '--line'
+<
+                Option for the log command of each SCM system.
+
 
 
 ==============================================================================
 CHANGELOG                                                   *minscm-changelog*
+
+0.3.0:
+  - Added g:minscm_hgLogOption, g:minscm_gitLogOption, and
+    g:minscm_bzrLogOption options.
+  - Improved MinSCMGrep command and now it creates a quickfix list.
+  - Changed default log style for Mercurial repositories.
+  - Fixed a bug that MinSCMLog command for Mercurial repositories could not
+    show graph log in some environments (thanks to mii for the patch).
+  - Fixed a bug that MinSCMCommitFile, MinSCMCommitTracked, and
+    MinSCMCommitAll commands for repositories which had not been committed
+    didn't work.
 
 0.2.1:
   - Fixed a bug that the log command for Mercurial repositories didn't work on

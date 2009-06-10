@@ -53,7 +53,7 @@ MinSCM は様々な SCM システム (VCS) のリポジトリを扱うプラグ�
                                                         *g:minscm_getStatus()*
 リポジトリ情報をステータスラインに表示 ~
 
-g:minscm_getStatus() を利用してください。|'statusline'|も参照してください。
+g:minscm_getStatus() を利用してください。(関連項目: |'statusline'|)
 
                                                           *minscm-fuzzyfinder*
 Fuzzyfinder プラグインとの連携 ~
@@ -176,11 +176,12 @@ MinSCM のコマンドが ! 修飾子付きで実行された場合、利用す�
 
                                                                   *:MinSCMLog*
 :MinSCMLog[!]                   (デフォルトキーマッピング: \sl)
-        リビジョンの履歴を表示します。
+        リビジョンの履歴を表示します。(関連項目: |g:minscm_hgLogOption|
+        |g:minscm_gitLogOption| |g:minscm_bzrLogOption|)
 
                 使用する SCM コマンド ~
-                hg  : log --graph
-                git : log --graph --all
+                hg  : glog
+                git : log
                 bzr : log
 
                                                                *:MinSCMStatus*
@@ -194,11 +195,11 @@ MinSCM のコマンドが ! 修飾子付きで実行された場合、利用す�
 
                                                                  *:MinSCMGrep*
 :MinSCMGrep[!]                  (デフォルトキーマッピング: \sg)
-        指定パターンで検索します。
+        指定パターンで検索し、|quickfix|リストを作成します。
 
                 使用する SCM コマンド ~
-                hg  : grep
-                git : grep
+                hg  : grep -n
+                git : grep -n -e
                 bzr : (unavailable)
 
                                                               *:MinSCMLoadAll*
@@ -214,9 +215,7 @@ MinSCM のコマンドが ! 修飾子付きで実行された場合、利用す�
                                                              *:MinSCMFindFile*
 :MinSCMFindFile[!]              (デフォルトキーマッピング: \sf)
         Fuzzyfinder を使って追跡されている全ファイルの中からファイルを選択
-        して開きます。
-
-        |minscm-fuzzyfinder|も参照してください。
+        して開きます。(関連項目: |minscm-fuzzyfinder|)
 
                 使用する SCM コマンド ~
                 hg  : locate -f
@@ -246,6 +245,15 @@ MinSCM のコマンドが ! 修飾子付きで実行された場合、利用す�
 
                 このプレフィックスから実行されたコマンドでは、利用する SCM シ
                 ステムの優先順位が逆転します。
+
+                                                     *g:minscm_hgLogOption*
+                                                    *g:minscm_gitLogOption*
+                                                    *g:minscm_bzrLogOption*  >
+        let g:minscm_hgLogOption = '--style compact'
+        let g:minscm_gitLogOption = '--all --graph --pretty=format:''%h (%ci) %s'''
+        let g:minscm_bzrLogOption = '--line'
+<
+                各 SCM システムの log コマンドのオプションです。
 
 
 

@@ -114,7 +114,7 @@ endfunction
 
 "
 function s:implementor.getLogLines()
-  return split(self.execute(['log --line']), "\n")
+  return split(self.execute(['log', g:minscm_bzrLogOption]), "\n")
 endfunction
 
 "
@@ -133,7 +133,7 @@ function s:implementor.getStatusesAll()
 endfunction
 
 "
-"function s:implementor.getGrepLines(pattern)
+"function s:implementor.getGrepQuickFixes(pattern)
 "endfunction
 
 "
