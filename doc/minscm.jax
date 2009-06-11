@@ -77,10 +77,12 @@ MinSCM のコマンドが ! 修飾子付きで実行された場合、利用す�
 
                                                               *:MinSCMCommand*
 :MinSCMCommand[!]               (デフォルトキーマッピング: \s:)
+
         入力した任意のコマンドを実行します。
 
                                                            *:MinSCMCommitFile*
 :MinSCMCommitFile[!]            (デフォルトキーマッピング: \sC)
+
         カレントバッファのファイルをコミットします。
 
                 使用する SCM コマンド ~
@@ -90,6 +92,7 @@ MinSCM のコマンドが ! 修飾子付きで実行された場合、利用す�
 
                                                         *:MinSCMCommitTracked*
 :MinSCMCommitTracked[!]         (デフォルトキーマッピング: \s<C-c>)
+
         追跡されている全ファイルをコミットします。
 
                 使用する SCM コマンド ~
@@ -99,6 +102,7 @@ MinSCM のコマンドが ! 修飾子付きで実行された場合、利用す�
 
                                                             *:MinSCMCommitAll*
 :MinSCMCommitAll[!]             (デフォルトキーマッピング: \sc)
+
         カレントリポジトリの作業ディレクトリ内の全ファイルをコミットします。
 
         追跡されていないファイルをカレントリポジトリに追加する点が
@@ -111,6 +115,7 @@ MinSCM のコマンドが ! 修飾子付きで実行された場合、利用す�
 
                                                              *:MinSCMCheckout*
 :MinSCMCheckout[!]              (デフォルトキーマッピング: \so)
+
         指定したリビジョンをチェックアウトします。
 
                 使用する SCM コマンド ~
@@ -120,6 +125,7 @@ MinSCM のコマンドが ! 修飾子付きで実行された場合、利用す�
 
                                                                 *:MinSCMMerge*
 :MinSCMMerge[!]                 (デフォルトキーマッピング: \sm)
+
         指定したリビジョンを作業ディレクトリにマージします。
 
                 使用する SCM コマンド ~
@@ -129,6 +135,7 @@ MinSCM のコマンドが ! 修飾子付きで実行された場合、利用す�
 
                                                                *:MinSCMBranch*
 :MinSCMBranch[!]                (デフォルトキーマッピング: \sb)
+
         新ブランチを作成します。
 
                 使用する SCM コマンド ~
@@ -138,6 +145,7 @@ MinSCM のコマンドが ! 修飾子付きで実行された場合、利用す�
 
                                                          *:MinSCMBranchDelete*
 :MinSCMBranchDelete[!]          (デフォルトキーマッピング: \sB)
+
         既存のブランチを削除します。
 
                 使用する SCM コマンド ~
@@ -147,6 +155,7 @@ MinSCM のコマンドが ! 修飾子付きで実行された場合、利用す�
 
                                                                *:MinSCMRebase*
 :MinSCMRebase[!]                (デフォルトキーマッピング: \sr)
+
         チェンジセットを指定したリビジョンへ移動します。
 
                 使用する SCM コマンド ~
@@ -156,6 +165,7 @@ MinSCM のコマンドが ! 修飾子付きで実行された場合、利用す�
 
                                                              *:MinSCMDiffFile*
 :MinSCMDiffFile[!]              (デフォルトキーマッピング: \sD)
+
         カレントバッファのファイルとその指定リビジョンのバージョン間で、
         (vimdiff のような) Diff モードを新規タブページで開始します。
 
@@ -166,6 +176,7 @@ MinSCM のコマンドが ! 修飾子付きで実行された場合、利用す�
 
                                                               *:MinSCMDiffAll*
 :MinSCMDiffAll[!]               (デフォルトキーマッピング: \sd)
+
         カレントリポジトリの作業ディレクトリ内の全ファイルと指定リビジョン間の
         差分を表示します。
 
@@ -176,6 +187,7 @@ MinSCM のコマンドが ! 修飾子付きで実行された場合、利用す�
 
                                                                   *:MinSCMLog*
 :MinSCMLog[!]                   (デフォルトキーマッピング: \sl)
+
         リビジョンの履歴を表示します。(関連項目: |g:minscm_hgLogOption|
         |g:minscm_gitLogOption| |g:minscm_bzrLogOption|)
 
@@ -184,8 +196,19 @@ MinSCM のコマンドが ! 修飾子付きで実行された場合、利用す�
                 git : log
                 bzr : log
 
+                                                         *:MinSCMAnnotateFile*
+:MinSCMAnnotateFile[!]          (Default mapping: \sn)
+
+        カレントバッファのファイルの各行について、コミット情報を表示します。
+
+                Used SCM commands ~
+                hg  : annotate
+                git : annotate
+                bzr : annotate
+
                                                                *:MinSCMStatus*
 :MinSCMStatus[!]                (デフォルトキーマッピング: \ss)
+
         変更のあるファイルのリストを表示します。
 
                 使用する SCM コマンド ~
@@ -195,6 +218,7 @@ MinSCM のコマンドが ! 修飾子付きで実行された場合、利用す�
 
                                                                  *:MinSCMGrep*
 :MinSCMGrep[!]                  (デフォルトキーマッピング: \sg)
+
         指定パターンで検索し、|quickfix|リストを作成します。
 
                 使用する SCM コマンド ~
@@ -204,6 +228,7 @@ MinSCM のコマンドが ! 修飾子付きで実行された場合、利用す�
 
                                                               *:MinSCMLoadAll*
 :MinSCMLoadAll[!]               (デフォルトキーマッピング: \s<CR>)
+
         追跡されている全ファイルを vim に読み込みます。無関係のバッファは
         (:bdelete で)アンロードされます。
 
@@ -214,6 +239,7 @@ MinSCM のコマンドが ! 修飾子付きで実行された場合、利用す�
 
                                                              *:MinSCMFindFile*
 :MinSCMFindFile[!]              (デフォルトキーマッピング: \sf)
+
         Fuzzyfinder を使って追跡されている全ファイルの中からファイルを選択
         して開きます。(関連項目: |minscm-fuzzyfinder|)
 
@@ -226,35 +252,72 @@ MinSCM のコマンドが ! 修飾子付きで実行された場合、利用す�
 オプション                                                    *minscm-options*
 
                                                    *g:minscm_availableScms*  >
-        let g:minscm_availableScms = ['git', 'mercurial', 'bazaar']
+  let g:minscm_availableScms = ['git', 'mercurial', 'bazaar']
 <
-                利用したい SCM システム名のリストです。
+        利用したい SCM システム名のリストです。
 
-                複数のSCMシステムのリポジトリが見つかった場合、カレントとなる
-                リポジトリの優先順位は g:minscm_availableScms の順に準じます。
+        複数のSCMシステムのリポジトリが見つかった場合、カレントとなるリポジト
+        リの優先順位は g:minscm_availableScms の順に準じます。
 
                                                        *g:minscm_mapLeader*  >
-        let g:minscm_mapLeader = '\s'
+  let g:minscm_mapLeader = '\s'
 <
-                MinSCM のキーマッピングのプレフィックスとなるキー列です。
+        MinSCM コマンドへマップされるキー列のプレフィックスです。
 
                                               *g:minscm_mapLeaderAlternate*  >
-        let g:minscm_mapLeaderAlternate = '\S'
+  let g:minscm_mapLeaderAlternate = '\S'
 <
-                MinSCM のキーマッピングのプレフィックスとなるキー列です。
+        MinSCM コマンドへマップされるキー列のプレフィックスです。
 
-                このプレフィックスから実行されたコマンドでは、利用する SCM シ
-                ステムの優先順位が逆転します。
+        このプレフィックスから実行されたコマンドでは、利用する SCM システムの
+        優先順位が逆転します。
 
-                                                     *g:minscm_hgLogOption*
-                                                    *g:minscm_gitLogOption*
-                                                    *g:minscm_bzrLogOption*  >
-        let g:minscm_hgLogOption = '--style compact'
-        let g:minscm_gitLogOption = '--all --graph --pretty=format:''%h (%ci) %s'''
-        let g:minscm_bzrLogOption = '--line'
+                                                   *g:minscm_mapKeyCommand*  >
+  let g:minscm_mapKeyCommand       = ':'
+<                                               *g:minscm_mapKeyCommitFile*  >
+  let g:minscm_mapKeyCommitFile    = 'C'
+<                                            *g:minscm_mapKeyCommitTracked*  >
+  let g:minscm_mapKeyCommitTracked = '<C-c>'
+<                                                *g:minscm_mapKeyCommitAll*  >
+  let g:minscm_mapKeyCommitAll     = 'c'
+<                                                 *g:minscm_mapKeyCheckout*  >
+  let g:minscm_mapKeyCheckout      = 'o'
+<                                                    *g:minscm_mapKeyMerge*  >
+  let g:minscm_mapKeyMerge         = 'm'
+<                                                   *g:minscm_mapKeyBranch*  >
+  let g:minscm_mapKeyBranch        = 'b'
+<                                             *g:minscm_mapKeyBranchDelete*  >
+  let g:minscm_mapKeyBranchDelete  = 'B'
+<                                                   *g:minscm_mapKeyRebase*  >
+  let g:minscm_mapKeyRebase        = 'r'
+<                                                 *g:minscm_mapKeyDiffFile*  >
+  let g:minscm_mapKeyDiffFile      = 'D'
+<                                                  *g:minscm_mapKeyDiffAll*  >
+  let g:minscm_mapKeyDiffAll       = 'd'
+<                                                      *g:minscm_mapKeyLog*  >
+  let g:minscm_mapKeyLog           = 'l'
+<                                             *g:minscm_mapKeyAnnotateFile*  >
+  let g:minscm_mapKeyAnnotateFile  = 'l'
+<                                                   *g:minscm_mapKeyStatus*  >
+  let g:minscm_mapKeyStatus        = 's'
+<                                                     *g:minscm_mapKeyGrep*  >
+  let g:minscm_mapKeyGrep          = 'g'
+<                                                  *g:minscm_mapKeyLoadAll*  >
+  let g:minscm_mapKeyLoadAll       = '<CR>'
+<                                                 *g:minscm_mapKeyFindFile*  >
+  let g:minscm_mapKeyFindFile      = 'f'
 <
-                各 SCM システムの log コマンドのオプションです。
+        MinSCM コマンドへマップされるキー列の、|g:minscm_mapLeader|や
+        |g:minscm_mapLeaderAlternate|に続く部分です。
 
+                                                     *g:minscm_hgLogOption*  >
+  let g:minscm_hgLogOption  = '--style compact'
+<                                                   *g:minscm_gitLogOption*  >
+  let g:minscm_gitLogOption = '--all --graph --pretty=format:''%h (%ci) %s'''
+<                                                   *g:minscm_bzrLogOption*  >
+  let g:minscm_bzrLogOption = '--line'
+<
+        各 SCM システムの log コマンドのオプションです。
 
 
 ==============================================================================

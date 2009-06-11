@@ -26,16 +26,90 @@ endfunction
 " LOCAL FUNCTION: {{{1
 
 "
-function! s:initialize()
-  " --------------------------------------------------------------------------
+function! s:getNames()
+  return [
+        \   'Command'      ,
+        \   'CommitFile'   ,
+        \   'CommitTracked',
+        \   'CommitAll'    ,
+        \   'Checkout'     ,
+        \   'Merge'        ,
+        \   'Branch'       ,
+        \   'BranchDelete' ,
+        \   'Rebase'       ,
+        \   'DiffFile'     ,
+        \   'DiffAll'      ,
+        \   'Log'          ,
+        \   'AnnotateFile' ,
+        \   'Status'       ,
+        \   'Grep'         ,
+        \   'LoadAll'      ,
+        \   'FindFile'     ,
+        \ ]
+endfunction
+
+"
+function! s:initOptons()
   if !exists('g:minscm_availableScms')
-    let g:minscm_availableScms = filter(['mercurial', 'git', 'bazaar'], 'minscm#{v:val}#isExecutable()')
+    let g:minscm_availableScms = filter(['mercurial', 'git', 'bazaar'],
+          \                             'minscm#{v:val}#isExecutable()')
   endif
   if !exists('g:minscm_mapLeader')
     let g:minscm_mapLeader = '\s'
   endif
   if !exists('g:minscm_mapLeaderAlternate')
     let g:minscm_mapLeaderAlternate = '\S'
+  endif
+  if !exists('g:minscm_mapKeyCommand')
+    let g:minscm_mapKeyCommand = ':'
+  endif
+  if !exists('g:minscm_mapKeyCommitFile')
+    let g:minscm_mapKeyCommitFile = 'C'
+  endif
+  if !exists('g:minscm_mapKeyCommitTracked')
+    let g:minscm_mapKeyCommitTracked = '<C-c>'
+  endif
+  if !exists('g:minscm_mapKeyCommitAll')
+    let g:minscm_mapKeyCommitAll = 'c'
+  endif
+  if !exists('g:minscm_mapKeyCheckout')
+    let g:minscm_mapKeyCheckout = 'o'
+  endif
+  if !exists('g:minscm_mapKeyMerge')
+    let g:minscm_mapKeyMerge = 'm'
+  endif
+  if !exists('g:minscm_mapKeyBranch')
+    let g:minscm_mapKeyBranch = 'b'
+  endif
+  if !exists('g:minscm_mapKeyBranchDelete')
+    let g:minscm_mapKeyBranchDelete = 'B'
+  endif
+  if !exists('g:minscm_mapKeyRebase')
+    let g:minscm_mapKeyRebase = 'r'
+  endif
+  if !exists('g:minscm_mapKeyDiffFile')
+    let g:minscm_mapKeyDiffFile = 'D'
+  endif
+  if !exists('g:minscm_mapKeyDiffAll')
+    let g:minscm_mapKeyDiffAll = 'd'
+  endif
+  if !exists('g:minscm_mapKeyLog')
+    let g:minscm_mapKeyLog = 'l'
+  endif
+  if !exists('g:minscm_mapKeyAnnotateFile')
+    let g:minscm_mapKeyAnnotateFile = 'n'
+  endif
+  if !exists('g:minscm_mapKeyStatus')
+    let g:minscm_mapKeyStatus = 's'
+  endif
+  if !exists('g:minscm_mapKeyGrep')
+    let g:minscm_mapKeyGrep = 'g'
+  endif
+  if !exists('g:minscm_mapKeyLoadAll')
+    let g:minscm_mapKeyLoadAll = '<CR>'
+  endif
+  if !exists('g:minscm_mapKeyFindFile')
+    let g:minscm_mapKeyFindFile = 'f'
   endif
   if !exists('g:minscm_hgLogOption')
     let g:minscm_hgLogOption = '--style compact'
@@ -46,64 +120,50 @@ function! s:initialize()
   if !exists('g:minscm_bzrLogOption')
     let g:minscm_bzrLogOption = '--line'
   endif
-  " --------------------------------------------------------------------------
-  command! -bang MinSCMCommand       call minscm#executeCommand      (len(<q-bang>), minscm#getTargetDir())
-  command! -bang MinSCMCommitFile    call minscm#executeCommitFile   (len(<q-bang>), minscm#getTargetDir())
-  command! -bang MinSCMCommitTracked call minscm#executeCommitTracked(len(<q-bang>), minscm#getTargetDir())
-  command! -bang MinSCMCommitAll     call minscm#executeCommitAll    (len(<q-bang>), minscm#getTargetDir())
-  command! -bang MinSCMCheckout      call minscm#executeCheckout     (len(<q-bang>), minscm#getTargetDir())
-  command! -bang MinSCMMerge         call minscm#executeMerge        (len(<q-bang>), minscm#getTargetDir())
-  command! -bang MinSCMBranch        call minscm#executeBranch       (len(<q-bang>), minscm#getTargetDir())
-  command! -bang MinSCMBranchDelete  call minscm#executeBranchDelete (len(<q-bang>), minscm#getTargetDir())
-  command! -bang MinSCMRebase        call minscm#executeRebase       (len(<q-bang>), minscm#getTargetDir())
-  command! -bang MinSCMDiffFile      call minscm#executeDiffFile     (len(<q-bang>), minscm#getTargetDir())
-  command! -bang MinSCMDiffAll       call minscm#executeDiffAll      (len(<q-bang>), minscm#getTargetDir())
-  command! -bang MinSCMLog           call minscm#executeLog          (len(<q-bang>), minscm#getTargetDir())
-  command! -bang MinSCMStatus        call minscm#executeStatus       (len(<q-bang>), minscm#getTargetDir())
-  command! -bang MinSCMGrep          call minscm#executeGrep         (len(<q-bang>), minscm#getTargetDir())
-  command! -bang MinSCMLoadAll       call minscm#executeLoadAll      (len(<q-bang>), minscm#getTargetDir())
-  command! -bang MinSCMFindFile      call minscm#executeFindFile     (len(<q-bang>), minscm#getTargetDir())
-  " --------------------------------------------------------------------------
-  let tableMapping = [
-        \   [':     ', ':MinSCMCommand'      ],
-        \   ['C     ', ':MinSCMCommitFile'   ],
-        \   ['<C-c> ', ':MinSCMCommitTracked'],
-        \   ['c     ', ':MinSCMCommitAll'    ],
-        \   ['o     ', ':MinSCMCheckout'     ],
-        \   ['m     ', ':MinSCMMerge'        ],
-        \   ['b     ', ':MinSCMBranch'       ],
-        \   ['B     ', ':MinSCMBranchDelete' ],
-        \   ['r     ', ':MinSCMRebase'       ],
-        \   ['D     ', ':MinSCMDiffFile'     ],
-        \   ['d     ', ':MinSCMDiffAll'      ],
-        \   ['l     ', ':MinSCMLog'          ],
-        \   ['s     ', ':MinSCMStatus'       ],
-        \   ['g     ', ':MinSCMGrep'         ],
-        \   ['<CR>  ', ':MinSCMLoadAll'      ],
-        \   ['f     ', ':MinSCMFindFile'     ],
-        \ ]
+endfunction
+
+"
+function! s:initCommands()
+  for name in s:getNames()
+    execute printf('command! -bang %s call %s(%s)',
+          \        'MinSCM' . name,
+          \        'minscm#execute' . name,
+          \        'len(<q-bang>), minscm#getTargetDir()')
+  endfor
+endfunction
+
+"
+function! s:initMappings()
   for [leader, bang] in [ [g:minscm_mapLeader, ''], [g:minscm_mapLeaderAlternate, '!'] ]
     execute printf('nnoremap <silent> %s      <Nop>', leader)
     execute printf('nnoremap <silent> %s<Esc> <Nop>', leader)
-    for [key, cmd] in tableMapping
-      execute printf('nnoremap <silent> %s%s %s%s<CR>', leader, key, cmd, bang)
+    for name in s:getNames()
+      execute printf('nnoremap <silent> %s :%s%s<CR>',
+            \        leader . g:minscm_mapKey{name},
+            \        'MinSCM' . name,
+            \        bang)
     endfor
   endfor
-  " --------------------------------------------------------------------------
+endfunction
+
+"
+function! s:initAutoCommands()
   augroup MinSCMGlobal
     autocmd!
     autocmd CursorHold   * call minscm#invalidateStatusReport(minscm#getTargetDir())
     autocmd CursorHoldI  * call minscm#invalidateStatusReport(minscm#getTargetDir())
     "autocmd BufWritePost * call minscm#invalidateStatusReport(minscm#getTargetDir())
   augroup END
-  " --------------------------------------------------------------------------
 endfunction
 
 " }}}1
 "=============================================================================
 " INITIALIZATION: {{{1
 
-call s:initialize()
+call s:initOptons()
+call s:initCommands()
+call s:initMappings()
+call s:initAutoCommands()
 
 " }}}1
 "=============================================================================

@@ -117,6 +117,15 @@ function! minscm#executeLog(boolAlt, cwd)
 endfunction
 
 "
+function! minscm#executeAnnotateFile(boolAlt, cwd)
+  let impl = s:createImplementor(a:boolAlt, a:cwd, 1)
+  if !impl.isValid()
+    return
+  endif
+  call impl.annotateFile()
+endfunction
+
+"
 function! minscm#executeStatus(boolAlt, cwd)
   let impl = s:createImplementor(a:boolAlt, a:cwd, 1)
   if !impl.isValid() || !s:warnIfUnsavedBufferExist(0)
@@ -519,16 +528,16 @@ endfunction
 
 "
 function s:implementorBase.diffFile()
-  call minscm#echo('DiffFile: ' . self.getRepositoryReport())
   let fileTarget = minscm#getTargetFile()
+  if !filereadable(fileTarget)
+    call minscm#echoError('Cannot read the file: ' . minscm#escapeForShell(fileTarget))
+    return
+  endif
+  call minscm#echo('DiffFile: ' . self.getRepositoryReport())
   let revision = s:inputHighlighting('Question', 'Compare with: ',
         \                            self.getRevisionHead(), self.getRevisions())
   if revision == ''
     call minscm#echoWarning('Canceled')
-    return
-  endif
-  if !filereadable(fileTarget)
-    call minscm#echoError('Cannot read the file: ' . minscm#escapeForShell(fileTarget))
     return
   endif
   try
@@ -566,13 +575,34 @@ function s:implementorBase.diffAll()
     call minscm#echo('No changes.')
     return
   endif
-  call s:tempbuffer_launch(lines, self.formatTempBufferName('DiffAll'), 'diff', 0, self, '', '')
+  call s:tempbuffer_launch(lines, self.formatTempBufferName('DiffAll'),
+        \                  'diff', 0, self, '', '')
 endfunction
 
 "
 function s:implementorBase.log()
   let lines = self.getLogLines()
-  call s:tempbuffer_launch(lines, self.formatTempBufferName('Log'), 'minscm-log', 0, self, '', '')
+  call s:tempbuffer_launch(lines, self.formatTempBufferName('Log'),
+        \                  'minscm-log', 0, self, '', '')
+endfunction
+
+"
+function s:implementorBase.annotateFile()
+  let fileTarget = minscm#getTargetFile()
+  if !filereadable(fileTarget)
+    call minscm#echoError('Cannot read the file: ' . minscm#escapeForShell(fileTarget))
+    return
+  endif
+  call minscm#echo('AnnotateFile: ' . self.getRepositoryReport())
+  let revision = s:inputHighlighting('Question', 'Revision to annotate: ',
+        \                            self.getRevisionHead(), self.getRevisions())
+  if revision == ''
+    call minscm#echoWarning('Canceled')
+    return
+  endif
+  let lines = self.getAnnotateFileLines(revision, fileTarget)
+  call s:tempbuffer_launch(lines, self.formatTempBufferName('AnnotateFile'),
+        \                  'minscm-annotate', 0, self, '', '')
 endfunction
 
 "

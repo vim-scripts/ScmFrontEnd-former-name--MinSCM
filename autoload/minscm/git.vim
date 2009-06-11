@@ -101,19 +101,27 @@ endfunction
 
 "
 function s:implementor.getDiffFileLines(revision, file)
-  let optRev = minscm#escapeForShell(a:revision)
-  return split(self.execute(['diff', optRev, '--', minscm#escapeForShell(a:file)]), "\n")
+  let cmds = ['diff', minscm#escapeForShell(a:revision),
+        \     '--', minscm#escapeForShell(a:file)]
+  return split(self.execute(cmds), "\n")
 endfunction
 
 "
 function s:implementor.getDiffAllLines(revision)
-  let optRev = minscm#escapeForShell(a:revision)
-  return split(self.execute(['diff', optRev]), "\n")
+  let cmds = ['diff', minscm#escapeForShell(a:revision)]
+  return split(self.execute(cmds), "\n")
 endfunction
 
 "
 function s:implementor.getLogLines()
   return split(self.execute(['log', g:minscm_gitLogOption]), "\n")
+endfunction
+
+"
+function s:implementor.getAnnotateFileLines(revision, file)
+  let cmds = ['annotate', minscm#escapeForShell(a:revision),
+        \     '--', minscm#escapeForShell(a:file)]
+  return split(self.execute(cmds), "\n")
 endfunction
 
 "

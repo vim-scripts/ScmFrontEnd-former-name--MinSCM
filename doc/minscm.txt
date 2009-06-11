@@ -77,10 +77,12 @@ is reversed.
 
                                                               *:MinSCMCommand*
 :MinSCMCommand[!]               (Default mapping: \s:)
+
         Executes any command you input.
 
                                                            *:MinSCMCommitFile*
 :MinSCMCommitFile[!]            (Default mapping: \sC)
+
         Commits a file of a current buffer.
 
                 Used SCM commands ~
@@ -90,6 +92,7 @@ is reversed.
 
                                                         *:MinSCMCommitTracked*
 :MinSCMCommitTracked[!]         (Default mapping: \s<C-c>)
+
         Commits all tracked files.
 
                 Used SCM commands ~
@@ -99,6 +102,7 @@ is reversed.
 
                                                             *:MinSCMCommitAll*
 :MinSCMCommitAll[!]             (Default mapping: \sc)
+
         Commits all files in a working directory of a current repository.
 
         This command is different from |:MinSCMCommitTracked| in adding
@@ -111,6 +115,7 @@ is reversed.
 
                                                              *:MinSCMCheckout*
 :MinSCMCheckout[!]              (Default mapping: \so)
+
         Checkouts specified revision.
 
                 Used SCM commands ~
@@ -120,6 +125,7 @@ is reversed.
 
                                                                 *:MinSCMMerge*
 :MinSCMMerge[!]                 (Default mapping: \sm)
+
         Merges working directory of a current repository with specified
         revision.
 
@@ -130,6 +136,7 @@ is reversed.
 
                                                                *:MinSCMBranch*
 :MinSCMBranch[!]                (Default mapping: \sb)
+
         Creates new branch.
 
                 Used SCM commands ~
@@ -139,6 +146,7 @@ is reversed.
 
                                                          *:MinSCMBranchDelete*
 :MinSCMBranchDelete[!]          (Default mapping: \sB)
+
         Deletes a branch.
 
                 Used SCM commands ~
@@ -148,6 +156,7 @@ is reversed.
 
                                                                *:MinSCMRebase*
 :MinSCMRebase[!]                (Default mapping: \sr)
+
         Moves changeset onto specified revision.
 
                 Used SCM commands ~
@@ -157,6 +166,7 @@ is reversed.
 
                                                              *:MinSCMDiffFile*
 :MinSCMDiffFile[!]              (Default mapping: \sD)
+
         Starts diff mode (like vimdiff) in new tabpage between a file of a
         current buffer and its version of specified revision.
 
@@ -167,6 +177,7 @@ is reversed.
 
                                                               *:MinSCMDiffAll*
 :MinSCMDiffAll[!]               (Default mapping: \sd)
+
         Shows differences between all files in a working directory of a
         current repository and specified revision.
 
@@ -177,6 +188,7 @@ is reversed.
 
                                                                   *:MinSCMLog*
 :MinSCMLog[!]                   (Default mapping: \sl)
+
         Shows revision history. (see also: |g:minscm_hgLogOption|
         |g:minscm_gitLogOption| |g:minscm_bzrLogOption|)
 
@@ -185,8 +197,19 @@ is reversed.
                 git : log
                 bzr : log
 
+                                                         *:MinSCMAnnotateFile*
+:MinSCMAnnotateFile[!]          (Default mapping: \sn)
+
+        Shows commit information per file line.
+
+                Used SCM commands ~
+                hg  : annotate
+                git : annotate
+                bzr : annotate
+
                                                                *:MinSCMStatus*
 :MinSCMStatus[!]                (Default mapping: \ss)
+
         Shows a list of changed files.
 
                 Used SCM commands ~
@@ -196,6 +219,7 @@ is reversed.
 
                                                                  *:MinSCMGrep*
 :MinSCMGrep[!]                  (Default mapping: \sg)
+
         Searches for specified pattern and creates a |quickfix| list.
 
                 Used SCM commands ~
@@ -205,6 +229,7 @@ is reversed.
 
                                                               *:MinSCMLoadAll*
 :MinSCMLoadAll[!]               (Default mapping: \s<CR>)
+
         Loads all tracked files with vim after unloading (by :bdelete) buffes
         which are not tracked files.
 
@@ -212,8 +237,10 @@ is reversed.
                 hg  : locate -f
                 git : ls-files
                 bzr : ls
+
                                                              *:MinSCMFindFile*
 :MinSCMFindFile[!]              (Default mapping: \sf)
+
         Opens a selected file from all tracked files using Fuzzyfinder. 
         (see also: |minscm-fuzzyfinder|)
 
@@ -226,40 +253,87 @@ is reversed.
 OPTIONS                                                       *minscm-options*
 
                                                    *g:minscm_availableScms*  >
-        let g:minscm_availableScms = ['git', 'mercurial', 'bazaar']
+  let g:minscm_availableScms = ['git', 'mercurial', 'bazaar']
 <
-                Names of SCM systems which you want to use.
+        Names of SCM systems which you want to use.
 
-                If repositories of more than one SCM systems are found, the
-                repository of SCM system which appears before others in
-                g:minscm_availableScms has a priority.
+        If repositories of more than one SCM systems are found, the repository
+        of SCM system which appears before others in g:minscm_availableScms
+        has a priority.
 
                                                        *g:minscm_mapLeader*  >
-        let g:minscm_mapLeader = '\s'
+  let g:minscm_mapLeader = '\s'
 <
-                Key sequence which MinSCM key mappings begin with.
+        Prefix of key sequences which are mapped to MinSCM commands.
 
                                               *g:minscm_mapLeaderAlternate*  >
-        let g:minscm_mapLeaderAlternate = '\S'
+  let g:minscm_mapLeaderAlternate = '\S'
 <
-                Key sequence which MinSCM key mappings begin with.
+        Prefix of key sequences which are mapped to MinSCM commands.
 
-                This executes same commands as |g:minscm_mapLeader| except
-                that reverses the priority of SCM systems.
+        This executes same commands as |g:minscm_mapLeader| except that
+        reverses the priority of SCM systems.
 
-                                                     *g:minscm_hgLogOption*
-                                                    *g:minscm_gitLogOption*
-                                                    *g:minscm_bzrLogOption*  >
-        let g:minscm_hgLogOption = '--style compact'
-        let g:minscm_gitLogOption = '--all --graph --pretty=format:''%h (%ci) %s'''
-        let g:minscm_bzrLogOption = '--line'
+                                                   *g:minscm_mapKeyCommand*  >
+  let g:minscm_mapKeyCommand       = ':'
+<                                               *g:minscm_mapKeyCommitFile*  >
+  let g:minscm_mapKeyCommitFile    = 'C'
+<                                            *g:minscm_mapKeyCommitTracked*  >
+  let g:minscm_mapKeyCommitTracked = '<C-c>'
+<                                                *g:minscm_mapKeyCommitAll*  >
+  let g:minscm_mapKeyCommitAll     = 'c'
+<                                                 *g:minscm_mapKeyCheckout*  >
+  let g:minscm_mapKeyCheckout      = 'o'
+<                                                    *g:minscm_mapKeyMerge*  >
+  let g:minscm_mapKeyMerge         = 'm'
+<                                                   *g:minscm_mapKeyBranch*  >
+  let g:minscm_mapKeyBranch        = 'b'
+<                                             *g:minscm_mapKeyBranchDelete*  >
+  let g:minscm_mapKeyBranchDelete  = 'B'
+<                                                   *g:minscm_mapKeyRebase*  >
+  let g:minscm_mapKeyRebase        = 'r'
+<                                                 *g:minscm_mapKeyDiffFile*  >
+  let g:minscm_mapKeyDiffFile      = 'D'
+<                                                  *g:minscm_mapKeyDiffAll*  >
+  let g:minscm_mapKeyDiffAll       = 'd'
+<                                                      *g:minscm_mapKeyLog*  >
+  let g:minscm_mapKeyLog           = 'l'
+<                                             *g:minscm_mapKeyAnnotateFile*  >
+  let g:minscm_mapKeyAnnotateFile  = 'l'
+<                                                   *g:minscm_mapKeyStatus*  >
+  let g:minscm_mapKeyStatus        = 's'
+<                                                     *g:minscm_mapKeyGrep*  >
+  let g:minscm_mapKeyGrep          = 'g'
+<                                                  *g:minscm_mapKeyLoadAll*  >
+  let g:minscm_mapKeyLoadAll       = '<CR>'
+<                                                 *g:minscm_mapKeyFindFile*  >
+  let g:minscm_mapKeyFindFile      = 'f'
 <
-                Option for the log command of each SCM system.
+        Parts of key sequences following |g:minscm_mapLeader| or
+        |g:minscm_mapLeaderAlternate|, which are mapped to MinSCM commands.
 
+                                                     *g:minscm_hgLogOption*  >
+  let g:minscm_hgLogOption  = '--style compact'
+<                                                   *g:minscm_gitLogOption*  >
+  let g:minscm_gitLogOption = '--all --graph --pretty=format:''%h (%ci) %s'''
+<                                                   *g:minscm_bzrLogOption*  >
+  let g:minscm_bzrLogOption = '--line'
+<
+        Options for the log command of each SCM system.
 
 
 ==============================================================================
 CHANGELOG                                                   *minscm-changelog*
+
+0.4.0:
+  - Added MinSCMAnnotateFile command.
+  - Added g:minscm_mapKeyCommand, g:minscm_mapKeyCommitFile,
+    g:minscm_mapKeyCommitTracked, g:minscm_mapKeyCommitAll,
+    g:minscm_mapKeyCheckout, g:minscm_mapKeyMerge, g:minscm_mapKeyBranch,
+    g:minscm_mapKeyBranchDelete, g:minscm_mapKeyRebase,
+    g:minscm_mapKeyDiffFile, g:minscm_mapKeyDiffAll, g:minscm_mapKeyLog,
+    g:minscm_mapKeyAnnotateFile, g:minscm_mapKeyStatus, g:minscm_mapKeyGrep,
+    g:minscm_mapKeyLoadAll, and g:minscm_mapKeyFindFile options.
 
 0.3.0:
   - Added g:minscm_hgLogOption, g:minscm_gitLogOption, and

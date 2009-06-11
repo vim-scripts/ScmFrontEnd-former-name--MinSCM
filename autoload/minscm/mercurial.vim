@@ -112,8 +112,16 @@ function s:implementor.getLogLines()
 endfunction
 
 "
+function s:implementor.getAnnotateFileLines(revision, file)
+  let cmds = ['annotate -r', minscm#escapeForShell(a:revision),
+        \     minscm#escapeForShell(a:file)]
+  return split(self.execute(cmds), "\n")
+endfunction
+
+"
 function s:implementor.getStatusesFile(file)
-  return map(split(self.execute(['status', minscm#escapeForShell(a:file)]), "\n"), 's:formatStatusLine(v:val)')
+  let cmds = ['status', minscm#escapeForShell(a:file)]
+  return map(split(self.execute(cmds), "\n"), 's:formatStatusLine(v:val)')
 endfunction
 
 "
