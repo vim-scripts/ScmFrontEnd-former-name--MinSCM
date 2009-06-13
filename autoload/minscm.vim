@@ -144,6 +144,15 @@ function! minscm#executeGrep(boolAlt, cwd)
 endfunction
 
 "
+function! minscm#executeLoadModified(boolAlt, cwd)
+  let impl = s:createImplementor(a:boolAlt, a:cwd, 1)
+  if !impl.isValid() || !s:warnIfUnsavedBufferExist(0)
+    return
+  endif
+  call impl.loadModified()
+endfunction
+
+"
 function! minscm#executeLoadAll(boolAlt, cwd)
   let impl = s:createImplementor(a:boolAlt, a:cwd, 1)
   if !impl.isValid() || !s:warnIfUnsavedBufferExist(0)
@@ -301,7 +310,7 @@ function s:implementorBase.commitFile()
     return
   endif
   try
-    let linesDiff = self.getDiffFileLines(self.getRevisionHead(), fileTarget)
+    let linesDiff = self.getDiffFileLines(self.getRevisionParent(), fileTarget)
   catch
     let linesDiff = []
   endtry
@@ -322,7 +331,7 @@ function s:implementorBase.commitTracked()
     return
   endif
   try
-    let linesDiff = self.getDiffAllLines(self.getRevisionHead())
+    let linesDiff = self.getDiffAllLines(self.getRevisionParent())
   catch
     let linesDiff = []
   endtry
@@ -343,7 +352,7 @@ function s:implementorBase.commitAll()
     return
   endif
   try
-    let linesDiff = self.getDiffAllLines(self.getRevisionHead())
+    let linesDiff = self.getDiffAllLines(self.getRevisionParent())
   catch
     let linesDiff = []
   endtry
@@ -535,7 +544,7 @@ function s:implementorBase.diffFile()
   endif
   call minscm#echo('DiffFile: ' . self.getRepositoryReport())
   let revision = s:inputHighlighting('Question', 'Compare with: ',
-        \                            self.getRevisionHead(), self.getRevisions())
+        \                            self.getRevisionParent(), self.getRevisions())
   if revision == ''
     call minscm#echoWarning('Canceled')
     return
@@ -565,7 +574,7 @@ endfunction
 function s:implementorBase.diffAll()
   call minscm#echo('DiffAll: ' . self.getRepositoryReport())
   let revision = s:inputHighlighting('Question', 'Compare with: ',
-        \                            self.getRevisionHead(), self.getRevisions())
+        \                            self.getRevisionParent(), self.getRevisions())
   if revision == ''
     call minscm#echoWarning('Canceled')
     return
@@ -595,7 +604,7 @@ function s:implementorBase.annotateFile()
   endif
   call minscm#echo('AnnotateFile: ' . self.getRepositoryReport())
   let revision = s:inputHighlighting('Question', 'Revision to annotate: ',
-        \                            self.getRevisionHead(), self.getRevisions())
+        \                            self.getRevisionParent(), self.getRevisions())
   if revision == ''
     call minscm#echoWarning('Canceled')
     return
@@ -624,6 +633,13 @@ function s:implementorBase.grep()
   endif
   call setqflist(self.getGrepQuickFixes(pattern))
   cope
+endfunction
+
+"
+function s:implementorBase.loadModified()
+  let files = self.getLsModified()
+  call s:deleteAllBuffersExcept(files)
+  call s:loadFiles(files)
 endfunction
 
 "
@@ -744,13 +760,14 @@ endfunction
 
 "
 function! s:formatCommitBufferLines(nameScm, dirRoot, nameBranch, linesStatus, linesDiff)
+  let s:TEXT_FORMAT_WIDTH = 78
   return  [''] +
-        \ [ repeat('#', 78) ] +
+        \ [ repeat('#', s:TEXT_FORMAT_WIDTH) ] +
         \ [ '# SCM: ' . a:nameScm ] +
         \ [ '# Root: ' . a:dirRoot ] +
         \ [ '# Branch: ' . a:nameBranch ] +
         \ map(a:linesStatus, '"# " . v:val') +
-        \ [ repeat('#', 78) ] +
+        \ [ repeat('#', s:TEXT_FORMAT_WIDTH) ] +
         \ map(a:linesDiff, '"#|" . v:val')
 endfunction
 

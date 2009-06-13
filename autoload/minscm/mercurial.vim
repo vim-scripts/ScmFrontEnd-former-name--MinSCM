@@ -113,9 +113,12 @@ endfunction
 
 "
 function s:implementor.getAnnotateFileLines(revision, file)
-  let cmds = ['annotate -r', minscm#escapeForShell(a:revision),
+  let revNormal = self.normalizeRevision(a:revision)
+  " NOTE: -f option shows filename.
+  let cmds = ['annotate -nudq -r', revNormal,
         \     minscm#escapeForShell(a:file)]
-  return split(self.execute(cmds), "\n")
+  return map(split(self.execute(cmds), "\n"),
+        \    's:formatAnnotateLine(v:val, revNormal)')
 endfunction
 
 "
@@ -151,6 +154,12 @@ function s:implementor.getGrepQuickFixes(pattern)
 endfunction
 
 "
+function s:implementor.getLsModified()
+  return map(split(self.execute(['status -mn']), "\n"),
+        \    'fnamemodify(self.dirRoot, ":p") . v:val')
+endfunction
+
+"
 function s:implementor.getLsAll()
   return split(self.execute(['locate -f']), "\n")
 endfunction
@@ -166,13 +175,19 @@ function s:implementor.getCommandName()
 endfunction
 
 "
-function s:implementor.getRevisionHead()
+function s:implementor.getRevisionParent()
   return '.'
 endfunction
 
 "
 function s:implementor.getRevisions()
   return ['.', 'null',] + self.getTags() + self.getBranches()
+endfunction
+
+"
+function s:implementor.normalizeRevision(revision)
+  return self.execute(['log --template "{rev}" -r',
+        \              minscm#escapeForShell(a:revision)])
 endfunction
 
 "
@@ -200,6 +215,17 @@ function! s:formatStatusLine(line)
     endif
   endfor
   return a:line
+endfunction
+
+"
+function! s:formatAnnotateLine(line, revNew)
+  let strDst = '||'
+  if a:line =~ '\<0\s\+\d\d\d\d-\d\d-\d\d:'
+    let strDst = '|-'
+  elseif matchstr(a:line, '\<\d\+\ze\s\+\d\d\d\d-\d\d-\d\d:') == a:revNew
+    let strDst = '|+'
+  endif
+  return substitute(a:line, ': ', strDst, '')
 endfunction
 
 " }}}1

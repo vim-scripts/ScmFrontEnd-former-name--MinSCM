@@ -43,6 +43,7 @@ function! s:getNames()
         \   'AnnotateFile' ,
         \   'Status'       ,
         \   'Grep'         ,
+        \   'LoadModified' ,
         \   'LoadAll'      ,
         \   'FindFile'     ,
         \ ]
@@ -105,6 +106,9 @@ function! s:initOptons()
   if !exists('g:minscm_mapKeyGrep')
     let g:minscm_mapKeyGrep = 'g'
   endif
+  if !exists('g:minscm_mapKeyLoadModified')
+    let g:minscm_mapKeyLoadModified = '!'
+  endif
   if !exists('g:minscm_mapKeyLoadAll')
     let g:minscm_mapKeyLoadAll = '<CR>'
   endif
@@ -112,13 +116,13 @@ function! s:initOptons()
     let g:minscm_mapKeyFindFile = 'f'
   endif
   if !exists('g:minscm_hgLogOption')
-    let g:minscm_hgLogOption = '--style compact'
+    let g:minscm_hgLogOption = '-l1000 --style compact'
   endif
   if !exists('g:minscm_gitLogOption')
-    let g:minscm_gitLogOption = '--all --graph --pretty=format:''%h (%ci) %s'''
+    let g:minscm_gitLogOption = '-1000 --all --graph --pretty=format:''%h (%ci) %s'''
   endif
   if !exists('g:minscm_bzrLogOption')
-    let g:minscm_bzrLogOption = '--line'
+    let g:minscm_bzrLogOption = '-l1000 --line'
   endif
 endfunction
 

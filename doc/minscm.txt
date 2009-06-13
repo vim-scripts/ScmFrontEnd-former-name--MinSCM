@@ -202,10 +202,13 @@ is reversed.
 
         Shows commit information per file line.
 
+        Lines which were modified at the commit of specified revision or added
+        at the initial commit are highlighted.
+
                 Used SCM commands ~
-                hg  : annotate
-                git : annotate
-                bzr : annotate
+                hg  : annotate -nudq
+                git : blame
+                bzr : annotate --all --long
 
                                                                *:MinSCMStatus*
 :MinSCMStatus[!]                (Default mapping: \ss)
@@ -227,10 +230,21 @@ is reversed.
                 git : grep -n -e
                 bzr : (unavailable)
 
+                                                         *:MinSCMLoadModified*
+:MinSCMLoadModified[!]          (Default mapping: \s!)
+
+        Loads all modified files with vim after unloading (by :bdelete)
+        buffers which are not modified files.
+
+                Used SCM commands ~
+                hg  : status -mn
+                git : ls-files -m
+                bzr : status -SV
+
                                                               *:MinSCMLoadAll*
 :MinSCMLoadAll[!]               (Default mapping: \s<CR>)
 
-        Loads all tracked files with vim after unloading (by :bdelete) buffes
+        Loads all tracked files with vim after unloading (by :bdelete) buffers
         which are not tracked files.
 
                 Used SCM commands ~
@@ -304,6 +318,8 @@ OPTIONS                                                       *minscm-options*
   let g:minscm_mapKeyStatus        = 's'
 <                                                     *g:minscm_mapKeyGrep*  >
   let g:minscm_mapKeyGrep          = 'g'
+<                                             *g:minscm_mapKeyLoadModified*  >
+  let g:minscm_mapKeyLoadModified  = '!'
 <                                                  *g:minscm_mapKeyLoadAll*  >
   let g:minscm_mapKeyLoadAll       = '<CR>'
 <                                                 *g:minscm_mapKeyFindFile*  >
@@ -324,6 +340,13 @@ OPTIONS                                                       *minscm-options*
 
 ==============================================================================
 CHANGELOG                                                   *minscm-changelog*
+
+0.5.0:
+  - Added MinSCMLoadModified command.
+  - Improved MinSCMAnnotateFile command to highlight lines which were modified
+    at the commit of specified revision or added at the initial commit.
+  - Changed default values of g:minscm_hgLogOption, g:minscm_gitLogOption, and
+    g:minscm_bzrLogOption to limit a number of revisions to show.
 
 0.4.0:
   - Added MinSCMAnnotateFile command.

@@ -201,10 +201,13 @@ MinSCM のコマンドが ! 修飾子付きで実行された場合、利用す�
 
         カレントバッファのファイルの各行について、コミット情報を表示します。
 
+        指定リビジョンのコミットで修正された行と最初のコミットで追加された行は
+        ハイライト表示されます。
+
                 Used SCM commands ~
-                hg  : annotate
-                git : annotate
-                bzr : annotate
+                hg  : annotate -nudq
+                git : blame
+                bzr : annotate --all --long
 
                                                                *:MinSCMStatus*
 :MinSCMStatus[!]                (デフォルトキーマッピング: \ss)
@@ -225,6 +228,17 @@ MinSCM のコマンドが ! 修飾子付きで実行された場合、利用す�
                 hg  : grep -n
                 git : grep -n -e
                 bzr : (unavailable)
+
+                                                         *:MinSCMLoadModified*
+:MinSCMLoadModified[!]          (Default mapping: \s!)
+
+        変更されている全ファイルを vim に読み込みます。無関係のバッファは
+        (:bdelete で)アンロードされます。
+
+                使用する SCM コマンド ~
+                hg  : status -mn
+                git : ls-files -m
+                bzr : status -SV
 
                                                               *:MinSCMLoadAll*
 :MinSCMLoadAll[!]               (デフォルトキーマッピング: \s<CR>)
@@ -302,6 +316,8 @@ MinSCM のコマンドが ! 修飾子付きで実行された場合、利用す�
   let g:minscm_mapKeyStatus        = 's'
 <                                                     *g:minscm_mapKeyGrep*  >
   let g:minscm_mapKeyGrep          = 'g'
+<                                             *g:minscm_mapKeyLoadModified*  >
+  let g:minscm_mapKeyLoadModified  = '!'
 <                                                  *g:minscm_mapKeyLoadAll*  >
   let g:minscm_mapKeyLoadAll       = '<CR>'
 <                                                 *g:minscm_mapKeyFindFile*  >

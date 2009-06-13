@@ -119,9 +119,11 @@ endfunction
 
 "
 function s:implementor.getAnnotateFileLines(revision, file)
-  let cmds = ['annotate -r', minscm#escapeForShell(a:revision),
+  let revNormal = self.normalizeRevision(a:revision)
+  let cmds = ['annotate --all --long -r', revNormal,
         \     minscm#escapeForShell(a:file)]
-  return split(self.execute(cmds), "\n")
+  return map(split(self.execute(cmds), "\n"),
+        \    's:formatAnnotateLine(v:val, revNormal)')
 endfunction
 
 "
@@ -145,7 +147,16 @@ endfunction
 
 "
 function s:implementor.getLsAll()
-  return map(split(self.execute(['ls -V --from-root']), "\n"), 'fnamemodify(self.dirRoot, ":p") . v:val')
+  return map(split(self.execute(['ls -V --from-root']), "\n"),
+        \    'fnamemodify(self.dirRoot, ":p") . v:val')
+endfunction
+
+"
+function s:implementor.getLsModified()
+  let files = map(filter(split(self.execute(['status -SV']), "\n"),
+        \                'v:val =~ ''^\s*M'''),
+        \         'matchstr(v:val, ''^\s*M\s*\zs.*'')')
+  return map(files, 'fnamemodify(self.dirRoot, ":p") . v:val')
 endfunction
 
 "
@@ -159,7 +170,7 @@ function s:implementor.getCommandName()
 endfunction
 
 "
-function s:implementor.getRevisionHead()
+function s:implementor.getRevisionParent()
   return '-1'
 endfunction
 
@@ -167,6 +178,12 @@ endfunction
 function s:implementor.getRevisions()
   return  ['revno:', 'revid:', 'last:', 'before:', 'date:', 'ancestor:', 'branch:', 'submit:'] +
         \ map(self.getTags(), '"tag:" . v:val')
+endfunction
+
+"
+function s:implementor.normalizeRevision(revision)
+  return matchstr(self.execute(
+        \ ['log --line -r', minscm#escapeForShell(a:revision)]), '^\d\+')
 endfunction
 
 "
@@ -191,6 +208,17 @@ function! s:formatStatusLine(line)
     endif
   endfor
   return a:line
+endfunction
+
+"
+function! s:formatAnnotateLine(line, revNew)
+  let strDst = '||'
+  if     a:line =~ '^1 '
+    let strDst = '|-'
+  elseif matchstr(a:line, '^\d\+') == a:revNew
+    let strDst = '|+'
+  endif
+  return substitute(a:line, ' | ', strDst, '')
 endfunction
 
 " }}}1

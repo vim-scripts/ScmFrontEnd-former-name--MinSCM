@@ -119,9 +119,11 @@ endfunction
 
 "
 function s:implementor.getAnnotateFileLines(revision, file)
-  let cmds = ['annotate', minscm#escapeForShell(a:revision),
+  let revNormal = self.normalizeRevision(a:revision)
+  let cmds = ['blame', revNormal,
         \     '--', minscm#escapeForShell(a:file)]
-  return split(self.execute(cmds), "\n")
+  return map(split(self.execute(cmds), "\n"),
+        \    's:formatAnnotateLine(v:val, revNormal)')
 endfunction
 
 "
@@ -135,7 +137,8 @@ endfunction
 "
 function s:implementor.getStatusesTracked()
   try
-    return map(split(self.execute(['diff --name-status HEAD']), "\n"), 's:formatStatusLine(v:val)')
+    return map(split(self.execute(['diff --name-status HEAD']), "\n"),
+          \    's:formatStatusLine(v:val)')
   catch /^MinSCM:execute:.*/
     " There are no tracked files.
     return []
@@ -145,7 +148,8 @@ endfunction
 "
 function s:implementor.getStatusesAll()
   return self.getStatusesTracked() +
-        \ map(split(self.execute(['ls-files --exclude-standard -o']), "\n"), 's:formatStatusLine("?\t" . v:val)')
+        \ map(split(self.execute(['ls-files --exclude-standard -o']), "\n"),
+        \     's:formatStatusLine("?\t" . v:val)')
 endfunction
 
 "
@@ -165,8 +169,14 @@ function s:implementor.getGrepQuickFixes(pattern)
 endfunction
 
 "
+function s:implementor.getLsModified()
+  return map(split(self.execute(['ls-files -m']), "\n"),
+        \    'fnamemodify(self.dirRoot, ":p") . v:val')
+endfunction
+
+"
 function s:implementor.getLsAll()
-  return map(split(self.execute(['ls-files --full-name']), "\n"),
+  return map(split(self.execute(['ls-files']), "\n"),
         \    'fnamemodify(self.dirRoot, ":p") . v:val')
 endfunction
 
@@ -181,13 +191,20 @@ function s:implementor.getCommandName()
 endfunction
 
 "
-function s:implementor.getRevisionHead()
+function s:implementor.getRevisionParent()
   return 'HEAD'
 endfunction
 
 "
 function s:implementor.getRevisions()
   return ['HEAD', ] + self.getTags() + self.getBranches()
+endfunction
+
+"
+function s:implementor.normalizeRevision(revision)
+  return matchstr(self.execute(
+        \ ['log --pretty=format:%H -1',
+        \  minscm#escapeForShell(a:revision)]), '^\x\+')
 endfunction
 
 "
@@ -217,6 +234,23 @@ function! s:formatStatusLine(line)
     endif
   endfor
   return a:line
+endfunction
+
+"
+function! s:formatAnnotateLine(line, revNew)
+  let strDst = '||'
+  if a:line =~ '^\^'
+    let strDst = '|-'
+  elseif s:isPrefixMatching(matchstr(a:line, '^\S\+'), a:revNew)
+    let strDst = '|+'
+  endif
+  return substitute(a:line, ')\zs ', strDst, '')
+endfunction
+
+"
+function! s:isPrefixMatching(s0, s1)
+  let pos = min([len(a:s0), len(a:s1)]) - 1
+  return a:s0[: pos] == a:s1[: pos]
 endfunction
 
 " }}}1
