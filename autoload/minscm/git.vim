@@ -69,6 +69,18 @@ function s:implementor.executeRebase(branch)
 endfunction
 
 "
+function s:implementor.executePull(location)
+  " don't minscm#escapeForShell()
+  call self.executeShell(['pull', a:location])
+endfunction
+
+"
+function s:implementor.executePush(location)
+  " don't minscm#escapeForShell()
+  call self.executeShell(['push', a:location])
+endfunction
+
+"
 function s:implementor.getCommandPrefix()
   return 'cd ' . minscm#escapeForShell(self.dirRoot) . ' && git --no-pager'
 endfunction
@@ -113,7 +125,13 @@ function s:implementor.getDiffAllLines(revision)
 endfunction
 
 "
-function s:implementor.getLogLines()
+function s:implementor.getLogFileLines(file)
+  return split(self.execute(['log', g:minscm_gitLogOption, '--',
+          \                  minscm#escapeForShell(a:file)]), "\n")
+endfunction
+
+"
+function s:implementor.getLogAllLines()
   return split(self.execute(['log', g:minscm_gitLogOption]), "\n")
 endfunction
 
@@ -210,6 +228,12 @@ endfunction
 "
 function s:implementor.getBranchDefault()
   return 'master'
+endfunction
+
+"
+function s:implementor.getLocations()
+  return copy(g:minscm_gitLocations) +
+        \ split(self.execute(['remote show']), "\n")
 endfunction
 
 " }}}1

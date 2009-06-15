@@ -90,6 +90,24 @@ function! minscm#executeRebase(boolAlt, cwd)
 endfunction
 
 "
+function! minscm#executePull(boolAlt, cwd)
+  let impl = s:createImplementor(a:boolAlt, a:cwd, 1)
+  if !impl.isValid() || !s:warnIfUnsavedBufferExist(1)
+    return
+  endif
+  call impl.pull()
+endfunction
+
+"
+function! minscm#executePush(boolAlt, cwd)
+  let impl = s:createImplementor(a:boolAlt, a:cwd, 1)
+  if !impl.isValid() || !s:warnIfUnsavedBufferExist(1)
+    return
+  endif
+  call impl.push()
+endfunction
+
+"
 function! minscm#executeDiffFile(boolAlt, cwd)
   let impl = s:createImplementor(a:boolAlt, a:cwd, 1)
   if !impl.isValid()
@@ -108,12 +126,21 @@ function! minscm#executeDiffAll(boolAlt, cwd)
 endfunction
 
 "
-function! minscm#executeLog(boolAlt, cwd)
+function! minscm#executeLogFile(boolAlt, cwd)
   let impl = s:createImplementor(a:boolAlt, a:cwd, 1)
   if !impl.isValid()
     return
   endif
-  call impl.log()
+  call impl.logFile()
+endfunction
+
+"
+function! minscm#executeLogAll(boolAlt, cwd)
+  let impl = s:createImplementor(a:boolAlt, a:cwd, 1)
+  if !impl.isValid()
+    return
+  endif
+  call impl.logAll()
 endfunction
 
 "
@@ -287,8 +314,7 @@ function s:implementorBase.command()
     return
   endif
   try
-    call minscm#echoMessage(self.execute([arg]))
-    call minscm#echoMessage('-- Command completed --')
+    call self.executeShell([arg])
     checktime
   catch /^MinSCM:execute:.*/
     call minscm#echoMessage(split(v:exception, "\n")[1:])
@@ -301,7 +327,8 @@ function s:implementorBase.commitFile()
   call minscm#echo('CommitFile: ' . self.getRepositoryReport())
   let fileTarget = minscm#getTargetFile()
   if !filereadable(fileTarget)
-    call minscm#echoError('Cannot read the file: ' . minscm#escapeForShell(fileTarget))
+    call minscm#echoError('Cannot read the file: ' .
+          \               minscm#escapeForShell(fileTarget))
     return
   endif
   let statuses = self.getStatusesFile(fileTarget)
@@ -432,7 +459,9 @@ function s:implementorBase.checkout()
     call minscm#echoError('This command is not supported.')
     return
   endif
-  let revision = s:inputHighlighting('Question', 'Revision to checkout: ', self.getBranchDefault(), self.getRevisions())
+  let revision = s:inputHighlighting('Question', 'Revision to checkout: ',
+        \                            self.getBranchDefault(),
+        \                            self.getRevisions())
   if revision == ''
     call minscm#echoWarning('Canceled')
     return
@@ -454,7 +483,8 @@ function s:implementorBase.merge()
     call minscm#echoError('This command is not supported.')
     return
   endif
-  let revision = s:inputHighlighting('Question', 'Merge with: ', '', self.getBranchesNoncurrent())
+  let revision = s:inputHighlighting('Question', 'Merge with: ', '',
+        \                            self.getBranchesNoncurrent())
   if revision == ''
     call minscm#echoWarning('Canceled')
     return
@@ -498,7 +528,8 @@ function s:implementorBase.branchDelete()
     call minscm#echoError('This command is not supported.')
     return
   endif
-  let branch = s:inputHighlighting('Question', 'branch name to delete: ', '', self.getBranchesNoncurrent())
+  let branch = s:inputHighlighting('Question', 'branch name to delete: ', '',
+        \                          self.getBranchesNoncurrent())
   if branch == ''
     call minscm#echoWarning('Canceled')
     return
@@ -520,7 +551,9 @@ function s:implementorBase.rebase()
     call minscm#echoError('This command is not supported.')
     return
   endif
-  let branch = s:inputHighlighting('Question', 'Upstream revision: ', self.getBranchDefault(), self.getRevisions())
+  let branch = s:inputHighlighting('Question', 'Upstream revision: ',
+        \                          self.getBranchDefault(),
+        \                          self.getRevisions())
   if branch == ''
     call minscm#echoWarning('Canceled')
     return
@@ -536,15 +569,54 @@ function s:implementorBase.rebase()
 endfunction
 
 "
+function s:implementorBase.pull()
+  call minscm#echo('Pull: ' . self.getRepositoryReport())
+  let locations = map(self.getLocations(), 'self.formatLocation(v:val)')
+  let location = s:inputHighlighting('Question', 'Pull from: ', '', locations)
+  if location == ''
+    call minscm#echoWarning('Canceled')
+    return
+  endif
+  try
+    call self.executePull(location)
+    call minscm#echoMessage('-- Pull completed --')
+    checktime
+  catch /^MinSCM:execute:.*/
+    call minscm#echoMessage(split(v:exception, "\n")[1:])
+    call minscm#echoError('Pull failed')
+  endtry
+endfunction
+
+"
+function s:implementorBase.push()
+  call minscm#echo('Push: ' . self.getRepositoryReport())
+  let locations = map(self.getLocations(), 'self.formatLocation(v:val)')
+  let location = s:inputHighlighting('Question', 'Push to: ', '', locations)
+  if location == ''
+    call minscm#echoWarning('Canceled')
+    return
+  endif
+  try
+    call self.executePush(location)
+    call minscm#echoMessage('-- Push completed --')
+  catch /^MinSCM:execute:.*/
+    call minscm#echoMessage(split(v:exception, "\n")[1:])
+    call minscm#echoError('Push failed')
+  endtry
+endfunction
+
+"
 function s:implementorBase.diffFile()
   let fileTarget = minscm#getTargetFile()
   if !filereadable(fileTarget)
-    call minscm#echoError('Cannot read the file: ' . minscm#escapeForShell(fileTarget))
+    call minscm#echoError('Cannot read the file: ' .
+          \               minscm#escapeForShell(fileTarget))
     return
   endif
   call minscm#echo('DiffFile: ' . self.getRepositoryReport())
   let revision = s:inputHighlighting('Question', 'Compare with: ',
-        \                            self.getRevisionParent(), self.getRevisions())
+        \                            self.getRevisionParent(),
+        \                            self.getRevisions())
   if revision == ''
     call minscm#echoWarning('Canceled')
     return
@@ -574,7 +646,8 @@ endfunction
 function s:implementorBase.diffAll()
   call minscm#echo('DiffAll: ' . self.getRepositoryReport())
   let revision = s:inputHighlighting('Question', 'Compare with: ',
-        \                            self.getRevisionParent(), self.getRevisions())
+        \                            self.getRevisionParent(),
+        \                            self.getRevisions())
   if revision == ''
     call minscm#echoWarning('Canceled')
     return
@@ -589,9 +662,22 @@ function s:implementorBase.diffAll()
 endfunction
 
 "
-function s:implementorBase.log()
-  let lines = self.getLogLines()
-  call s:tempbuffer_launch(lines, self.formatTempBufferName('Log'),
+function s:implementorBase.logFile()
+  let fileTarget = minscm#getTargetFile()
+  if !filereadable(fileTarget)
+    call minscm#echoError('Cannot read the file: ' .
+          \               minscm#escapeForShell(fileTarget))
+    return
+  endif
+  let lines = self.getLogFileLines(fileTarget)
+  call s:tempbuffer_launch(lines, self.formatTempBufferName('LogFile'),
+        \                  'minscm-log', 0, self, '', '')
+endfunction
+
+"
+function s:implementorBase.logAll()
+  let lines = self.getLogAllLines()
+  call s:tempbuffer_launch(lines, self.formatTempBufferName('LogAll'),
         \                  'minscm-log', 0, self, '', '')
 endfunction
 
@@ -599,12 +685,14 @@ endfunction
 function s:implementorBase.annotateFile()
   let fileTarget = minscm#getTargetFile()
   if !filereadable(fileTarget)
-    call minscm#echoError('Cannot read the file: ' . minscm#escapeForShell(fileTarget))
+    call minscm#echoError('Cannot read the file: ' .
+          \               minscm#escapeForShell(fileTarget))
     return
   endif
   call minscm#echo('AnnotateFile: ' . self.getRepositoryReport())
   let revision = s:inputHighlighting('Question', 'Revision to annotate: ',
-        \                            self.getRevisionParent(), self.getRevisions())
+        \                            self.getRevisionParent(),
+        \                            self.getRevisions())
   if revision == ''
     call minscm#echoWarning('Canceled')
     return
@@ -616,7 +704,8 @@ endfunction
 
 "
 function s:implementorBase.status()
-  call minscm#echo(['Status: ' . self.getRepositoryReport()] + self.getStatusesAll())
+  call minscm#echo(['Status: ' . self.getRepositoryReport()] +
+        \          self.getStatusesAll())
 endfunction
 
 "
@@ -665,14 +754,30 @@ function s:implementorBase.execute(args)
     let out = v:exception
   endtry
   if error || v:shell_error
-    throw printf("MinSCM:execute: Command error (%d)\n%s\n%s", v:shell_error, cmd, out)
+    throw printf("MinSCM:execute: Command error (%d)\n%s\n%s",
+          \      v:shell_error, cmd, out)
   endif
   return out
+endfunction
+
+" throws "MinSCM:execute\n..." if shell command had an error.
+function s:implementorBase.executeShell(args)
+  let cmd = join([self.getCommandPrefix()] + a:args, ' ')
+  execute '!' . cmd
+  if v:shell_error
+    throw printf("MinSCM:execute: Command error (%d)\n%s", v:shell_error, cmd)
+  endif
 endfunction
 
 "
 function s:implementorBase.formatTempBufferName(cmd)
   return '[MinSCM-' . a:cmd . '-' . self.getScmName() . ']'
+endfunction
+
+"
+function s:implementorBase.formatLocation(location)
+  return substitute(a:location, '${basename}',
+        \           fnamemodify(self.dirRoot, ':p:h:t'), 'g')
 endfunction
 
 "

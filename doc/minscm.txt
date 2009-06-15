@@ -25,8 +25,12 @@ Features:
   - Bazaar support
   - Abstract interface
   - Many commands
-  - Revision/Branch completion
+  - Syntax highlighting for status and diff in commit buffer.
+  - Syntax highlighting for annotate buffer
+  - Completion of revision/branch names
+  - Completion of locations for pull/push
   - Repositories report on status line
+  - Collaboration with Fuzzyfinder plugin
 
 
 ==============================================================================
@@ -83,7 +87,9 @@ is reversed.
                                                            *:MinSCMCommitFile*
 :MinSCMCommitFile[!]            (Default mapping: \sC)
 
-        Commits a file of a current buffer.
+        Opens temporary buffer for you to enter commit message. Write the
+        commit buffer and a file whose buffer was current before is committed.
+
 
                 Used SCM commands ~
                 hg  : commit
@@ -93,7 +99,8 @@ is reversed.
                                                         *:MinSCMCommitTracked*
 :MinSCMCommitTracked[!]         (Default mapping: \s<C-c>)
 
-        Commits all tracked files.
+        Opens temporary buffer for you to enter commit message. Write the
+        commit buffer and all tracked files are committed.
 
                 Used SCM commands ~
                 hg  : commit
@@ -103,7 +110,9 @@ is reversed.
                                                             *:MinSCMCommitAll*
 :MinSCMCommitAll[!]             (Default mapping: \sc)
 
-        Commits all files in a working directory of a current repository.
+        Opens temporary buffer for you to enter commit message. Write the
+        commit buffer and all files in a working directory of a current
+        repository are committed.
 
         This command is different from |:MinSCMCommitTracked| in adding
         untracked files to the current repository.
@@ -164,6 +173,26 @@ is reversed.
                 git : rebase
                 bzr : (unavailable)
 
+                                                                 *:MinSCMPull*
+:MinSCMPull[!]                  (Default mapping: \s[)
+
+        Pulls changes from specified repository.
+
+                Used SCM commands ~
+                hg  : pull
+                git : pull
+                bzr : pull
+
+                                                                 *:MinSCMPush*
+:MinSCMPush[!]                  (Default mapping: \s])
+
+        Pushes changes to specified repository.
+
+                Used SCM commands ~
+                hg  : push
+                git : push
+                bzr : push
+
                                                              *:MinSCMDiffFile*
 :MinSCMDiffFile[!]              (Default mapping: \sD)
 
@@ -186,8 +215,20 @@ is reversed.
                 git : diff
                 bzr : diff
 
-                                                                  *:MinSCMLog*
-:MinSCMLog[!]                   (Default mapping: \sl)
+                                                              *:MinSCMLogFile*
+:MinSCMLogFile[!]               (Default mapping: \sL)
+
+        Shows revision history related to a file of a current buffer. (see
+        also: |g:minscm_hgLogOption| |g:minscm_gitLogOption|
+        |g:minscm_bzrLogOption|)
+
+                Used SCM commands ~
+                hg  : glog
+                git : log
+                bzr : log
+
+                                                               *:MinSCMLogAll*
+:MinSCMLogAll[!]                (Default mapping: \sl)
 
         Shows revision history. (see also: |g:minscm_hgLogOption|
         |g:minscm_gitLogOption| |g:minscm_bzrLogOption|)
@@ -306,14 +347,20 @@ OPTIONS                                                       *minscm-options*
   let g:minscm_mapKeyBranchDelete  = 'B'
 <                                                   *g:minscm_mapKeyRebase*  >
   let g:minscm_mapKeyRebase        = 'r'
+<                                                     *g:minscm_mapKeyPull*  >
+  let g:minscm_mapKeyPull          = '['
+<                                                     *g:minscm_mapKeyPush*  >
+  let g:minscm_mapKeyPush          = ']'
 <                                                 *g:minscm_mapKeyDiffFile*  >
   let g:minscm_mapKeyDiffFile      = 'D'
 <                                                  *g:minscm_mapKeyDiffAll*  >
   let g:minscm_mapKeyDiffAll       = 'd'
-<                                                      *g:minscm_mapKeyLog*  >
-  let g:minscm_mapKeyLog           = 'l'
+<                                                  *g:minscm_mapKeyLogFile*  >
+  let g:minscm_mapKeyLogFile       = 'L'
+<                                                   *g:minscm_mapKeyLogAll*  >
+  let g:minscm_mapKeyLogAll        = 'l'
 <                                             *g:minscm_mapKeyAnnotateFile*  >
-  let g:minscm_mapKeyAnnotateFile  = 'l'
+  let g:minscm_mapKeyAnnotateFile  = 'n'
 <                                                   *g:minscm_mapKeyStatus*  >
   let g:minscm_mapKeyStatus        = 's'
 <                                                     *g:minscm_mapKeyGrep*  >
@@ -328,6 +375,27 @@ OPTIONS                                                       *minscm-options*
         Parts of key sequences following |g:minscm_mapLeader| or
         |g:minscm_mapLeaderAlternate|, which are mapped to MinSCM commands.
 
+                                                     *g:minscm_hgLocations*  >
+  let g:minscm_hgLocations = [
+        \ 'http://bitbucket.org/<account>/${basename}',
+        \ 'ssh://hg@bitbucket.org/<account>/${basename}',]
+<                                                   *g:minscm_gitLocations*  >
+  let g:minscm_gitLocations = [
+        \ 'git://github.com/<account>/${basename}.git', ]
+<                                                   *g:minscm_bzrLocations*  >
+  let g:minscm_bzrLocations = []
+<
+        Repository locations used as completion candidates in MinSCMPull and
+        MinSCMPush.
+
+        '${basename}' will be replaced with a root directory name.
+
+                                                   *g:minscm_hgPullIsFetch*  >
+  let g:minscm_hgPullIsFetch = 0
+<
+        If non-zero, MinSCMPull command executes 'hg fetch' instead of
+        'hg pull'.
+
                                                      *g:minscm_hgLogOption*  >
   let g:minscm_hgLogOption  = '--style compact'
 <                                                   *g:minscm_gitLogOption*  >
@@ -340,6 +408,18 @@ OPTIONS                                                       *minscm-options*
 
 ==============================================================================
 CHANGELOG                                                   *minscm-changelog*
+
+0.6.0:
+  - Added MinSCMLogFile command.
+  - Added MinSCMLoadPull command.
+  - Added MinSCMLoadPush command.
+  - Added g:minscm_hgLocations option.
+  - Added g:minscm_gitLocations option.
+  - Added g:minscm_bzrLocations option.
+  - Added g:minscm_hgPullIsFetch option.
+  - Renamed MinSCMLog command to MinSCMLogAll.
+  - Changed MinSCMCommand command to use :! command instead of system()
+    function.
 
 0.5.0:
   - Added MinSCMLoadModified command.

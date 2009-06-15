@@ -67,13 +67,25 @@ function s:implementor.executeRebase(branch)
 endfunction
 
 "
+function s:implementor.executePull(location)
+  let cmd = (g:minscm_hgPullIsFetch ? 'fetch' : 'pull')
+  call self.executeShell([cmd, minscm#escapeForShell(a:location)])
+endfunction
+
+"
+function s:implementor.executePush(location)
+  call self.executeShell(['push', minscm#escapeForShell(a:location)])
+endfunction
+
+"
 function s:implementor.getCommandPrefix()
   return 'hg --cwd ' . minscm#escapeForShell(self.dirRoot)
 endfunction
 
 "
 function s:implementor.getCatFileLines(revision, file)
-  return split(self.execute(['cat -r', minscm#escapeForShell(a:revision), minscm#escapeForShell(a:file)]), "\n")
+  return split(self.execute(['cat -r', minscm#escapeForShell(a:revision),
+        \                    minscm#escapeForShell(a:file)]), "\n")
 endfunction
 
 "
@@ -93,7 +105,8 @@ endfunction
 
 "
 function s:implementor.getDiffFileLines(revision, file)
-  return split(self.execute(['diff -r', minscm#escapeForShell(a:revision), a:file]), "\n")
+  return split(self.execute(['diff -r', minscm#escapeForShell(a:revision),
+        \                     minscm#escapeForShell(a:file)]), "\n")
 endfunction
 
 "
@@ -102,7 +115,19 @@ function s:implementor.getDiffAllLines(revision)
 endfunction
 
 "
-function s:implementor.getLogLines()
+function s:implementor.getLogFileLines(file)
+  try
+    return split(self.execute(['glog', g:minscm_hgLogOption,
+          \                    minscm#escapeForShell(a:file)]), "\n")
+  catch /^MinSCM:execute:.*/
+    return ['(To show a revision graph, enable graphlog extension.)', ''] +
+          \ split(self.execute(['log', g:minscm_hgLogOption,
+          \                     minscm#escapeForShell(a:file)]), "\n")
+  endtry
+endfunction
+
+"
+function s:implementor.getLogAllLines()
   try
     return split(self.execute(['glog', g:minscm_hgLogOption]), "\n")
   catch /^MinSCM:execute:.*/
@@ -193,6 +218,11 @@ endfunction
 "
 function s:implementor.getBranchDefault()
   return 'default'
+endfunction
+
+"
+function s:implementor.getLocations()
+  return copy(g:minscm_hgLocations)
 endfunction
 
 " }}}1

@@ -37,9 +37,12 @@ function! s:getNames()
         \   'Branch'       ,
         \   'BranchDelete' ,
         \   'Rebase'       ,
+        \   'Pull'         ,
+        \   'Push'         ,
         \   'DiffFile'     ,
         \   'DiffAll'      ,
-        \   'Log'          ,
+        \   'LogFile'      ,
+        \   'LogAll'       ,
         \   'AnnotateFile' ,
         \   'Status'       ,
         \   'Grep'         ,
@@ -88,14 +91,23 @@ function! s:initOptons()
   if !exists('g:minscm_mapKeyRebase')
     let g:minscm_mapKeyRebase = 'r'
   endif
+  if !exists('g:minscm_mapKeyPull')
+    let g:minscm_mapKeyPull = '['
+  endif
+  if !exists('g:minscm_mapKeyPush')
+    let g:minscm_mapKeyPush = ']'
+  endif
   if !exists('g:minscm_mapKeyDiffFile')
     let g:minscm_mapKeyDiffFile = 'D'
   endif
   if !exists('g:minscm_mapKeyDiffAll')
     let g:minscm_mapKeyDiffAll = 'd'
   endif
-  if !exists('g:minscm_mapKeyLog')
-    let g:minscm_mapKeyLog = 'l'
+  if !exists('g:minscm_mapKeyLogFile')
+    let g:minscm_mapKeyLogFile = 'L'
+  endif
+  if !exists('g:minscm_mapKeyLogAll')
+    let g:minscm_mapKeyLogAll = 'l'
   endif
   if !exists('g:minscm_mapKeyAnnotateFile')
     let g:minscm_mapKeyAnnotateFile = 'n'
@@ -114,6 +126,21 @@ function! s:initOptons()
   endif
   if !exists('g:minscm_mapKeyFindFile')
     let g:minscm_mapKeyFindFile = 'f'
+  endif
+  if !exists('g:minscm_hgLocations')
+    let g:minscm_hgLocations = [
+          \ 'http://bitbucket.org/<account>/${basename}',
+          \ 'ssh://hg@bitbucket.org/<account>/${basename}',]
+  endif
+  if !exists('g:minscm_gitLocations')
+    let g:minscm_gitLocations = [
+          \ 'git://github.com/<account>/${basename}.git', ]
+  endif
+  if !exists('g:minscm_bzrLocations')
+    let g:minscm_bzrLocations = []
+  endif
+  if !exists('g:minscm_hgPullIsFetch')
+    let g:minscm_hgPullIsFetch = 0
   endif
   if !exists('g:minscm_hgLogOption')
     let g:minscm_hgLogOption = '-l1000 --style compact'

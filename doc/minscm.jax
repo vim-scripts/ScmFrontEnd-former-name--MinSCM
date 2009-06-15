@@ -25,8 +25,12 @@ MinSCM は様々な SCM システム (VCS) のリポジトリを扱うプラグ�
   - Bazaar サポート
   - 抽象化されたインターフェース
   - 多くのコマンド
-  - リビジョン名の補完
+  - commit バッファ内の status と diff のシンタックスハイライト
+  - annotate バッファの シンタックスハイライト
+  - リビジョン/ブランチ名の補完
+  - pull/pushする場所の補完
   - リポジトリ情報のステータスラインでの表示
+  - Fuzzyfinder プラグインとの連携
 
 
 ==============================================================================
@@ -163,6 +167,26 @@ MinSCM のコマンドが ! 修飾子付きで実行された場合、利用す�
                 git : rebase
                 bzr : (unavailable)
 
+                                                                 *:MinSCMPull*
+:MinSCMPull[!]                  (Default mapping: \s[)
+
+        指定リポジトリから pull します。
+
+                Used SCM commands ~
+                hg  : pull
+                git : pull
+                bzr : pull
+
+                                                                 *:MinSCMPush*
+:MinSCMPush[!]                  (Default mapping: \s])
+
+        指定リポジトリへ push します。
+
+                Used SCM commands ~
+                hg  : push
+                git : push
+                bzr : push
+
                                                              *:MinSCMDiffFile*
 :MinSCMDiffFile[!]              (デフォルトキーマッピング: \sD)
 
@@ -185,8 +209,20 @@ MinSCM のコマンドが ! 修飾子付きで実行された場合、利用す�
                 git : diff
                 bzr : diff
 
-                                                                  *:MinSCMLog*
-:MinSCMLog[!]                   (デフォルトキーマッピング: \sl)
+                                                              *:MinSCMLogFile*
+:MinSCMLogFile[!]               (デフォルトキーマッピング: \sL)
+
+        カレントバッファのファイルに関係するリビジョンの履歴を表示します。(関
+        連項目: |g:minscm_hgLogOption| |g:minscm_gitLogOption|
+        |g:minscm_bzrLogOption|)
+
+                使用する SCM コマンド ~
+                hg  : glog
+                git : log
+                bzr : log
+
+                                                               *:MinSCMLogAll*
+:MinSCMLogAll[!]                (デフォルトキーマッピング: \sl)
 
         リビジョンの履歴を表示します。(関連項目: |g:minscm_hgLogOption|
         |g:minscm_gitLogOption| |g:minscm_bzrLogOption|)
@@ -304,14 +340,20 @@ MinSCM のコマンドが ! 修飾子付きで実行された場合、利用す�
   let g:minscm_mapKeyBranchDelete  = 'B'
 <                                                   *g:minscm_mapKeyRebase*  >
   let g:minscm_mapKeyRebase        = 'r'
+<                                                     *g:minscm_mapKeyPull*  >
+  let g:minscm_mapKeyPull          = '['
+<                                                     *g:minscm_mapKeyPush*  >
+  let g:minscm_mapKeyPush          = ']'
 <                                                 *g:minscm_mapKeyDiffFile*  >
   let g:minscm_mapKeyDiffFile      = 'D'
 <                                                  *g:minscm_mapKeyDiffAll*  >
   let g:minscm_mapKeyDiffAll       = 'd'
-<                                                      *g:minscm_mapKeyLog*  >
-  let g:minscm_mapKeyLog           = 'l'
+<                                                  *g:minscm_mapKeyLogFile*  >
+  let g:minscm_mapKeyLogFile       = 'L'
+<                                                   *g:minscm_mapKeyLogAll*  >
+  let g:minscm_mapKeyLogAll        = 'l'
 <                                             *g:minscm_mapKeyAnnotateFile*  >
-  let g:minscm_mapKeyAnnotateFile  = 'l'
+  let g:minscm_mapKeyAnnotateFile  = 'n'
 <                                                   *g:minscm_mapKeyStatus*  >
   let g:minscm_mapKeyStatus        = 's'
 <                                                     *g:minscm_mapKeyGrep*  >
@@ -325,6 +367,21 @@ MinSCM のコマンドが ! 修飾子付きで実行された場合、利用す�
 <
         MinSCM コマンドへマップされるキー列の、|g:minscm_mapLeader|や
         |g:minscm_mapLeaderAlternate|に続く部分です。
+
+                                                     *g:minscm_hgLocations*  >
+  let g:minscm_hgLocations  = []
+<                                                   *g:minscm_gitLocations*  >
+  let g:minscm_gitLocations = []
+<                                                   *g:minscm_bzrLocations*  >
+  let g:minscm_bzrLocations = []
+<
+        MinSCMPull と MinSCMPush で補完候補になるリポジトリの場所です。
+
+                                                   *g:minscm_hgPullIsFetch*  >
+  let g:minscm_hgPullIsFetch = 0
+<
+        真なら MinSCMPull コマンドは 'hg pull' の代わりに 'hg fetch' を実行し
+        ます。
 
                                                      *g:minscm_hgLogOption*  >
   let g:minscm_hgLogOption  = '--style compact'

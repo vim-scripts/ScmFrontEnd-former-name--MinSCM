@@ -64,6 +64,16 @@ endfunction
 "endfunction
 
 "
+function s:implementor.executePull(location)
+  call self.executeShell(['pull', minscm#escapeForShell(a:location)])
+endfunction
+
+"
+function s:implementor.executePush(location)
+  call self.executeShell(['push', minscm#escapeForShell(a:location)])
+endfunction
+
+"
 function s:implementor.getCommandPrefix()
   return 'cd ' . minscm#escapeForShell(self.dirRoot) . ' && bzr'
 endfunction
@@ -91,7 +101,8 @@ endfunction
 "
 function s:implementor.getDiffFileLines(revision, file)
   try
-    return split(self.execute(['diff -r', minscm#escapeForShell(a:revision), a:file]), "\n")
+    return split(self.execute(['diff -r', minscm#escapeForShell(a:revision),
+          \                    minscm#escapeForShell(a:file)]), "\n")
   catch /^MinSCM:execute:.*/
     if v:shell_error != 1
       throw v:exception
@@ -113,7 +124,13 @@ function s:implementor.getDiffAllLines(revision)
 endfunction
 
 "
-function s:implementor.getLogLines()
+function s:implementor.getLogFileLines(file)
+  return split(self.execute(['log', g:minscm_bzrLogOption,
+          \                  minscm#escapeForShell(a:file)]), "\n")
+endfunction
+
+"
+function s:implementor.getLogAllLines()
   return split(self.execute(['log', g:minscm_bzrLogOption]), "\n")
 endfunction
 
@@ -189,6 +206,11 @@ endfunction
 "
 function s:implementor.getBranchDefault()
   return ''
+endfunction
+
+"
+function s:implementor.getLocations()
+  return copy(g:minscm_bzrLocations)
 endfunction
 
 " }}}1
