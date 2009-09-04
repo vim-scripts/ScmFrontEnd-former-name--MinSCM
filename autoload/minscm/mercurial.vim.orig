@@ -67,25 +67,13 @@ function s:implementor.executeRebase(branch)
 endfunction
 
 "
-function s:implementor.executePull(location)
-  let cmd = (g:minscm_hgPullIsFetch ? 'fetch' : 'pull')
-  call self.executeShell([cmd, minscm#escapeForShell(a:location)])
-endfunction
-
-"
-function s:implementor.executePush(location)
-  call self.executeShell(['push', minscm#escapeForShell(a:location)])
-endfunction
-
-"
 function s:implementor.getCommandPrefix()
   return 'hg --cwd ' . minscm#escapeForShell(self.dirRoot)
 endfunction
 
 "
 function s:implementor.getCatFileLines(revision, file)
-  return split(self.execute(['cat -r', minscm#escapeForShell(a:revision),
-        \                    minscm#escapeForShell(a:file)]), "\n")
+  return split(self.execute(['cat -r', minscm#escapeForShell(a:revision), minscm#escapeForShell(a:file)]), "\n")
 endfunction
 
 "
@@ -105,8 +93,7 @@ endfunction
 
 "
 function s:implementor.getDiffFileLines(revision, file)
-  return split(self.execute(['diff -r', minscm#escapeForShell(a:revision),
-        \                     minscm#escapeForShell(a:file)]), "\n")
+  return split(self.execute(['diff -r', minscm#escapeForShell(a:revision), a:file]), "\n")
 endfunction
 
 "
@@ -115,19 +102,7 @@ function s:implementor.getDiffAllLines(revision)
 endfunction
 
 "
-function s:implementor.getLogFileLines(file)
-  try
-    return split(self.execute(['glog', g:minscm_hgLogOption,
-          \                    minscm#escapeForShell(a:file)]), "\n")
-  catch /^MinSCM:execute:.*/
-    return ['(To show a revision graph, enable graphlog extension.)', ''] +
-          \ split(self.execute(['log', g:minscm_hgLogOption,
-          \                     minscm#escapeForShell(a:file)]), "\n")
-  endtry
-endfunction
-
-"
-function s:implementor.getLogAllLines()
+function s:implementor.getLogLines()
   try
     return split(self.execute(['glog', g:minscm_hgLogOption]), "\n")
   catch /^MinSCM:execute:.*/
@@ -179,12 +154,6 @@ function s:implementor.getGrepQuickFixes(pattern)
 endfunction
 
 "
-function s:implementor.getLsModified()
-  return map(split(self.execute(['status -mn']), "\n"),
-        \    'fnamemodify(self.dirRoot, ":p") . v:val')
-endfunction
-
-"
 function s:implementor.getLsAll()
   return split(self.execute(['locate -f']), "\n")
 endfunction
@@ -220,13 +189,6 @@ function s:implementor.getBranchDefault()
   return 'default'
 endfunction
 
-"
-function s:implementor.getLocations()
-  return copy(g:minscm_hgLocations) +
-        \ map(split(self.execute(['paths']), "\n"),
-        \     'matchstr(v:val, ''^[^[:space:]=]\+'')')
-endfunction
-
 " }}}1
 "=============================================================================
 " UTILITY FUNCTIONS: {{{1
@@ -247,6 +209,25 @@ function! s:formatStatusLine(line)
     endif
   endfor
   return a:line
+endfunction
+
+"
+function! s:parseAndAddStatus(line, statuses)
+  for [pattern, key] in [
+        \   ['^?\s\+\zs.*', 'new'     ],
+        \   ['^!\s\+\zs.*', 'missing' ],
+        \   ['^M\s\+\zs.*', 'modified'],
+        \   ['^A\s\+\zs.*', 'added'   ],
+        \   ['^R\s\+\zs.*', 'removed' ],
+        \   ['^C\s\+\zs.*', 'clean'   ],
+        \   ['^I\s\+\zs.*', 'ignored' ],
+        \ ]
+    if a:line =~# pattern
+      call minscm#addToListDict(key, matchstr(a:line, pattern), statuses)
+      return
+    endif
+  endfor
+  call minscm#addToListDict('unknown', a:line, statuses)
 endfunction
 
 "

@@ -409,6 +409,14 @@ OPTIONS                                                       *minscm-options*
 ==============================================================================
 CHANGELOG                                                   *minscm-changelog*
 
+0.7.1:
+  - Fixed to correspond to API of Fuzzyfinder version 3.0.
+
+0.7.0:
+  - Improved the location completion for Mercurial repositories. Now
+    MinSCMLoadPull/MinSCMLoadPush can complete aliases for remote
+    repositories.
+
 0.6.0:
   - Added MinSCMLogFile command.
   - Added MinSCMLoadPull command.
