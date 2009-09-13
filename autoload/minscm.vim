@@ -740,7 +740,8 @@ endfunction
 
 "
 function s:implementorBase.findFile()
-  call fuf#givenfile#launch('', 0, self.getLsAll())
+  call fuf#givenfile#launch('', 0, '>MinSCM:FindFile>',
+        \ map(self.getLsAll(), 'fnamemodify(v:val, ":~:.")'))
 endfunction
 
 " throws "MinSCM:execute\n..." if shell command had an error.
